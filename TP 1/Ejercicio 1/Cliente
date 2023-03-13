@@ -1,0 +1,29 @@
+class ManejadorCliente implements Runnable {
+
+    private Socket cliente;
+
+    public ManejadorCliente(Socket cliente) {
+        this.cliente = cliente;
+    }
+
+    public void run() {
+        try {
+            // Obtiene los flujos de entrada y salida del cliente
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true);
+
+            // Lee los datos enviados por el cliente y los procesa
+            String mensaje = entrada.readLine();
+            System.out.println("Mensaje recibido: " + mensaje);
+            String respuesta = "Respuesta desde el servidor: " + mensaje.toUpperCase();
+            salida.println(respuesta);
+
+            // Cierra la conexión con el cliente
+            cliente.close();
+            System.out.println("Cliente desconectado");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
