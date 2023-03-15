@@ -1,2 +1,2 @@
 # sistemas-distribuidos
-Repositorio para la asignatura Sistemas Distribuidos y Programación Paralela
+Repositorio para la asignatura Sistemas Distribuidos y Programación Paralela.
