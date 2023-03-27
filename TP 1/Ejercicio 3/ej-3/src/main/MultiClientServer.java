@@ -1,53 +1,91 @@
+import org.apache.activemq.ActiveMQConnectionFactory;
+import javax.jms.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiClientServer {
-    private static final int PORT = 5000;
-    private static final Queue<String> messagesQueue = new LinkedList<>();
+    private Map<String, Queue<Message>> queues;
+    private ServerSocket serverSocket;
 
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(PORT);
-        System.out.println("Server started at port " + PORT);
+    public MultiClientServer(int port) throws IOException, JMSException {
+        queues = new HashMap<>();
+        serverSocket = new ServerSocket(port);
 
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+        Connection connection = connectionFactory.createConnection();
+        connection.start();
+
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+        Destination destination = session.createTopic("Messages");
+
+        MessageConsumer consumer = session.createConsumer(destination);
+
+        consumer.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                try {
+                    String queueName = message.getStringProperty("QueueName");
+                    if (!queues.containsKey(queueName)) {
+                        queues.put(queueName, new LinkedList<>());
+                    }
+                    Queue<Message> queue = queues.get(queueName);
+                    queue.offer(message);
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void start() throws IOException {
         while (true) {
             Socket clientSocket = serverSocket.accept();
-            System.out.println("New client connected");
-
-            Thread t = new Thread(new ClientHandler(clientSocket));
-            t.start();
+            ClientHandler handler = new ClientHandler(clientSocket, queues);
+            handler.start();
         }
     }
 
-    private static class ClientHandler implements Runnable {
-        private Socket clientSocket;
+    public static void main(String[] args) throws IOException, JMSException {
+        MultiClientServer server = new Server(12345);
+        server.start();
+    }
+}
 
-        public ClientHandler(Socket clientSocket) {
-            this.clientSocket = clientSocket;
-        }
+class ClientHandler extends Thread {
+    private Socket clientSocket;
+    private Map<String, Queue<Message>> queues;
 
-        @Override
-        public void run() {
-            try {
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                while (true) {
-                    if (!messagesQueue.isEmpty()) {
-                        String message = messagesQueue.poll();
-                        out.println(message);
+    public ClientHandler(Socket clientSocket, Map<String, Queue<Message>> queues) {
+        this.clientSocket = clientSocket;
+        this.queues = queues;
+    }
+
+    @Override
+    public void run() {
+        try {
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+
+            while (true) {
+                String queueName = in.readUTF();
+                Queue<Message> queue = queues.get(queueName);
+                if (queue != null) {
+                    Message message = queue.poll();
+                    if (message != null) {
+                        out.writeObject(message);
+                    } else {
+                        out.writeObject(null);
                     }
-                }
-            } catch (IOException e) {
-                System.out.println("Error handling client: " + e.getMessage());
-            } finally {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    System.out.println("Error closing client socket: " + e.getMessage());
+                } else {
+                    out.writeObject(null);
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

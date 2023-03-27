@@ -7,7 +7,7 @@ import java.net.Socket;
 public class ServidorSocketMulticliente {
     private ServerSocket serverSocket;
 
-    public MultiClienteServer(int port) throws IOException {
+    public ServidorSocketMulticliente(int port) throws IOException {
         // Crea un socket de servidor TCP/IP y lo asocia al puerto especificado
         serverSocket = new ServerSocket(port);
         System.out.println("Servidor en ejecución en " + serverSocket.getLocalSocketAddress());

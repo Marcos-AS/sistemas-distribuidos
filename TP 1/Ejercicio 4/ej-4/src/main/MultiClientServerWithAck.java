@@ -1,62 +1,91 @@
-import java.io.BufferedReader;
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.*;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MultiClientServerWithAck {
-    private static final int PORT = 5000;
-    private static final Queue<String> messagesQueue = new LinkedList<>();
 
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(PORT);
-        System.out.println("Server started at port " + PORT);
+    private static final String QUEUE_NAME = "messageQueue";
+    private static final String BROKER_URL = "tcp://localhost:61616";
+
+    private Map<String, MessageConsumer> consumers = new HashMap<>();
+
+    public void start() throws Exception {
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(BROKER_URL);
+        Connection connection = connectionFactory.createConnection();
+        connection.start();
+
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Queue queue = session.createQueue(QUEUE_NAME);
+
+        MessageProducer producer = session.createProducer(queue);
+
+        ServerSocket serverSocket = new ServerSocket(1234);
+        ExecutorService executor = Executors.newCachedThreadPool();
 
         while (true) {
             Socket clientSocket = serverSocket.accept();
-            System.out.println("New client connected");
-
-            Thread t = new Thread(new ClientHandler(clientSocket));
-            t.start();
+            executor.submit(new ClientHandler(clientSocket, session, producer));
         }
     }
 
-    private static class ClientHandler implements Runnable {
-        private Socket clientSocket;
+    private class ClientHandler implements Runnable {
 
-        public ClientHandler(Socket clientSocket) {
+        private Socket clientSocket;
+        private Session session;
+        private MessageProducer producer;
+
+        public ClientHandler(Socket clientSocket, Session session, MessageProducer producer) {
             this.clientSocket = clientSocket;
+            this.session = session;
+            this.producer = producer;
         }
 
-        @Override
         public void run() {
             try {
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                ObjectMessage message = (ObjectMessage) session.createMessage();
+                message.setObject(clientSocket.getInetAddress().getHostAddress());
+                producer.send(message);
+
+                MessageConsumer consumer = session.createConsumer(session.createTemporaryQueue());
+                consumers.put(clientSocket.getInetAddress().getHostAddress(), consumer);
 
                 while (true) {
-                    if (!messagesQueue.isEmpty()) {
-                        String message = messagesQueue.peek();
-                        out.println(message);
+                    ObjectMessage receivedMessage = (ObjectMessage) consumer.receive();
+                    String messageText = receivedMessage.getStringProperty("message");
+                    System.out.println("Received message: " + messageText);
 
-                        String ack = in.readLine();
-                        if (ack != null && ack.equals("ACK")) {
-                            messagesQueue.poll();
-                        }
+                    MessageProducer replyProducer = session.createProducer(receivedMessage.getJMSReplyTo());
+                    TextMessage replyMessage = session.createTextMessage();
+                    replyMessage.setText("ACK");
+                    replyProducer.send(replyMessage);
+
+                    if (messageText.equals("END")) {
+                        consumers.remove(clientSocket.getInetAddress().getHostAddress());
+                        break;
                     }
                 }
-            } catch (IOException e) {
-                System.out.println("Error handling client: " + e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
                 try {
                     clientSocket.close();
                 } catch (IOException e) {
-                    System.out.println("Error closing client socket: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        MultiClientServerWithAck server = new MultiClientServerWithAck();
+        server.start();
     }
 }

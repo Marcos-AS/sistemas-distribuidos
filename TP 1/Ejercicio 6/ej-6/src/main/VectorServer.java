@@ -1,77 +1,75 @@
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public class VectorServer {
 
-    private static final int PORT = 8000;
-
     public static void main(String[] args) throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        server.createContext("/vector", new VectorHandler());
+        HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+        server.createContext("/sum", new SumHandler());
+        server.createContext("/sub", new SubHandler());
         server.setExecutor(null);
         server.start();
-        System.out.println("Server started at port " + PORT);
     }
 
-    private static class VectorHandler implements HttpHandler {
-
-        @Override
+    static class SumHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
-            String method = exchange.getRequestMethod();
-            if (!method.equalsIgnoreCase("GET")) {
-                exchange.sendResponseHeaders(405, -1);
-                return;
-            }
-            String query = exchange.getRequestURI().getQuery();
-            if (query == null || query.isEmpty()) {
-                exchange.sendResponseHeaders(400, -1);
-                return;
-            }
-            String[] params = query.split("&");
-            if (params.length != 2) {
-                exchange.sendResponseHeaders(400, -1);
-                return;
-            }
-            double[] v1 = parseVector(params[0]);
-            double[] v2 = parseVector(params[1]);
-            if (v1 == null || v2 == null || v1.length != v2.length) {
-                exchange.sendResponseHeaders(400, -1);
-                return;
-            }
-            double[] sum = new double[v1.length];
-            double[] diff = new double[v1.length];
-            for (int i = 0; i < v1.length; i++) {
-                sum[i] = v1[i] + v2[i];
-                diff[i] = v1[i] - v2[i];
-            }
-            String response = "Vector sum: " + Arrays.toString(sum) + "\nVector difference: " + Arrays.toString(diff);
-            exchange.sendResponseHeaders(200, response.length());
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
-        }
+            if ("GET".equals(exchange.getRequestMethod())) {
+                String[] values = exchange.getRequestURI().getQuery().split("&");
+                int[] vector1 = parseVector(values[0]);
+                int[] vector2 = parseVector(values[1]);
+                int[] result = new int[vector1.length];
 
-        private double[] parseVector(String param) {
-            String[] tokens = param.split("=");
-            if (tokens.length != 2 || !tokens[0].equalsIgnoreCase("v")) {
-                return null;
-            }
-            String[] values = tokens[1].split(",");
-            double[] vector = new double[values.length];
-            for (int i = 0; i < values.length; i++) {
-                try {
-                    vector[i] = Double.parseDouble(values[i]);
-                } catch (NumberFormatException e) {
-                    return null;
+                for (int i = 0; i < vector1.length; i++) {
+                    result[i] = vector1[i] * vector2[i]; // Introducimos el error: multiplicamos en lugar de sumar
                 }
+
+                exchange.sendResponseHeaders(200, result.length);
+                exchange.getResponseBody().write(toByteArray(result));
+                exchange.close();
             }
-            return vector;
         }
+    }
+
+    static class SubHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                String[] values = exchange.getRequestURI().getQuery().split("&");
+                int[] vector1 = parseVector(values[0]);
+                int[] vector2 = parseVector(values[1]);
+                int[] result = new int[vector1.length];
+
+                for (int i = 0; i < vector1.length; i++) {
+                    result[i] = vector1[i] * vector2[i]; // Introducimos el error: multiplicamos en lugar de restar
+                }
+
+                exchange.sendResponseHeaders(200, result.length);
+                exchange.getResponseBody().write(toByteArray(result));
+                exchange.close();
+            }
+        }
+    }
+
+    static int[] parseVector(String vector) {
+        String[] values = vector.split(",");
+        int[] result = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = Integer.parseInt(values[i]);
+        }
+        return result;
+    }
+
+    static byte[] toByteArray(int[] vector) {
+        byte[] result = new byte[4 * vector.length];
+        for (int i = 0; i < vector.length; i++) {
+            int value = vector[i];
+            result[i * 4] = (byte) (value >> 24);
+            result[i * 4 + 1] = (byte) (value >> 16);
+            result[i * 4 + 2] = (byte) (value >> 8);
+            result[i * 4 + 3] = (byte) (value);
+        }
+        return result;
     }
 }

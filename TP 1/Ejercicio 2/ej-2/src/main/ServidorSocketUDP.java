@@ -6,7 +6,7 @@ import java.net.InetAddress;
 public class ServidorSocketUDP {
     private DatagramSocket serverSocket;
 
-    public MultiClientServerUDP(int port) throws IOException {
+    public ServidorSocketUDP(int port) throws IOException {
         // Crea un socket de servidor UDP y lo asocia al puerto especificado
         serverSocket = new DatagramSocket(port);
         System.out.println("Servidor en ejecución en " + serverSocket.getLocalSocketAddress());
