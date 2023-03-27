@@ -6,7 +6,7 @@
     <property name="java.specification.version" value="11"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2\target\test-classes;C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2\target\classes;C:\Users\leo_2\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="java.class.path" value="C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2\target\test-classes;C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2\target\classes;C:\Users\leo_2\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -17,9 +17,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="AR"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-11\bin"/>
-    <property name="sun.java.command" value="C:\Users\leo_2\AppData\Local\Temp\surefire15273816127681020320\surefirebooter-20230321194504657_3.jar C:\Users\leo_2\AppData\Local\Temp\surefire15273816127681020320 2023-03-21T19-45-04_028-jvmRun1 surefire-20230321194504657_1tmp surefire_0-20230321194504657_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\leo_2\AppData\Local\Temp\surefire18396687635729525997\surefirebooter-20230326224236147_3.jar C:\Users\leo_2\AppData\Local\Temp\surefire18396687635729525997 2023-03-26T22-42-35_527-jvmRun1 surefire-20230326224236147_1tmp surefire_0-20230326224236147_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2\target\test-classes;C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2\target\classes;C:\Users\leo_2\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
+    <property name="surefire.test.class.path" value="C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2\target\test-classes;C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2\target\classes;C:\Users\leo_2\.m2\repository\junit\junit\3.8.1\junit-3.8.1.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\leo_2"/>
     <property name="user.language" value="es"/>
@@ -27,13 +27,13 @@
     <property name="java.version.date" value="2023-01-17"/>
     <property name="java.home" value="C:\Program Files\Java\jdk-11"/>
     <property name="file.separator" value="\"/>
-    <property name="basedir" value="C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2"/>
+    <property name="basedir" value="C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2"/>
     <property name="java.vm.compressedOopsMode" value="32-bit"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="C:\Users\leo_2\AppData\Local\Temp\surefire15273816127681020320\surefirebooter-20230321194504657_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\leo_2\AppData\Local\Temp\surefire18396687635729525997\surefirebooter-20230326224236147_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="11.0.18+9-LTS-195"/>
@@ -48,7 +48,7 @@
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="C:\Users\leo_2\AppData\Local\Temp\"/>
     <property name="java.version" value="11.0.18"/>
-    <property name="user.dir" value="C:\Users\leo_2\OneDrive\Escritorio\UNLU\Sistemas Distribuidos y Programacion Parelal\TP 1\Ejercicio 2\ej-2"/>
+    <property name="user.dir" value="C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 1\Ejercicio 2\ej-2"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
