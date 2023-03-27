@@ -1,6 +1,6 @@
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 import javax.jms.*;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;

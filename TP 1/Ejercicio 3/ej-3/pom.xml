@@ -21,11 +21,12 @@
       <version>8.0.1</version>
     </dependency>
 
+
+  
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
-      <version>5.15.9</version>
+      <artifactId>activemq-core</artifactId>
+      <version>5.7.0</version>
     </dependency>
-    
   </dependencies>
 </project>

@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Cliente",
+            "request": "launch",
+            "mainClass": "Cliente",
+            "projectName": "ej-2"
+        },
+        {
+            "type": "java",
+            "name": "ClienteUDP",
+            "request": "launch",
+            "mainClass": "ClienteUDP",
+            "projectName": "ej-2"
+        },
+        {
+            "type": "java",
+            "name": "ServidorSocketMulticliente",
+            "request": "launch",
+            "mainClass": "ServidorSocketMulticliente",
+            "projectName": "ej-2"
+        },
+        {
+            "type": "java",
+            "name": "ServidorSocketUDP",
+            "request": "launch",
+            "mainClass": "ServidorSocketUDP",
+            "projectName": "ej-2"
+        },
+        {
+            "type": "java",
+            "name": "Cliente(1)",
+            "request": "launch",
+            "mainClass": "Cliente",
+            "projectName": "ej-3"
+        },
+        {
+            "type": "java",
+            "name": "MultiClientServer",
+            "request": "launch",
+            "mainClass": "MultiClientServer",
+            "projectName": "ej-3"
+        },
+        {
+            "type": "java",
+            "name": "ClienteConAck",
+            "request": "launch",
+            "mainClass": "ClienteConAck",
+            "projectName": "ej-4"
+        },
+        {
+            "type": "java",
+            "name": "MultiClientServerWithAck",
+            "request": "launch",
+            "mainClass": "MultiClientServerWithAck",
+            "projectName": "ej-4"
+        },
+        {
+            "type": "java",
+            "name": "WeatherServer",
+            "request": "launch",
+            "mainClass": "WeatherServer",
+            "projectName": "ej-5"
+        },
+        {
+            "type": "java",
+            "name": "VectorServer",
+            "request": "launch",
+            "mainClass": "VectorServer",
+            "projectName": "ej-6"
+        }
+    ]
+}

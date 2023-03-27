@@ -1,17 +1,22 @@
-import org.apache.activemq.ActiveMQConnectionFactory;
-import javax.jms.*;
-import javax.print.attribute.standard.Destination;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.Topic;
+
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
 
 public class MultiClientServer {
     private Map<String, Queue<Message>> queues;
@@ -21,14 +26,14 @@ public class MultiClientServer {
         serverSocket = new ServerSocket(port);
 
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
-        Connection connection = (Connection) connectionFactory.createConnection();
-        ((MultiClientServer) connection).start();
+        Connection connection = connectionFactory.createConnection();
+        connection.start();
 
-        Session session = ((javax.jms.Connection) connection).createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Message destination = (Message) session.createTopic("Messages");
+        Topic destination = session.createTopic("Messages");
 
-        MessageConsumer consumer = session.createConsumer((javax.jms.Destination) destination);
+        MessageConsumer consumer = session.createConsumer(destination);
 
         consumer.setMessageListener(new MessageListener() {
             @Override
@@ -36,7 +41,7 @@ public class MultiClientServer {
                 try {
                     String queueName = message.getStringProperty("QueueName");
                     if (!queues.containsKey(queueName)) {
-                        queues.put(queueName, new LinkedList<>());
+                        queues.put(queueName, new LinkedList());
                     }
                     Queue<Message> queue = queues.get(queueName);
                     queue.offer(message);
@@ -95,4 +100,3 @@ class ClientHandler extends Thread {
         }
     }
 }
-
