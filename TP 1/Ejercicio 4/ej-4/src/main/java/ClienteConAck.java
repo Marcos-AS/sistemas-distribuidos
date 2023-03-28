@@ -10,19 +10,18 @@ public class ClienteConAck {
 
     public static void main(String[] args) throws IOException {
         Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
-        System.out.println("Connected to server at " + SERVER_HOST + ":" + SERVER_PORT);
+        System.out.println("Conectado al servidor " + SERVER_HOST + ":" + SERVER_PORT);
 
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        while (true) {
-            String message = "Hello, server!";
+       
+            String message = "Hola servidor!";
             out.println(message);
-
-            String ack = in.readLine();
-            if (ack != null && ack.equals("ACK")) {
-                System.out.println("Message sent and acknowledged by server: " + message);
-            }
-        }
+            String msjRecibido = in.readLine();
+            System.out.println(msjRecibido);
+            if (msjRecibido != null)
+                out.println("ACK");
+            socket.close();
     }
 }

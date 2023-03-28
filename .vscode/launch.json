@@ -79,6 +79,16 @@
             "request": "launch",
             "mainClass": "VectorServer",
             "projectName": "ej-6"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ClimaApplication<ej-5>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ClimaApplication",
+            "projectName": "ej-5",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

@@ -8,6 +8,7 @@ public class WeatherServer {
     private static final int PORT = 8000;
 
     public static void main(String[] args) throws Exception {
+        // Crea servidor HTTP
         HttpServer server = HttpServer.create();
         server.bind(new java.net.InetSocketAddress(PORT), 0);
 
@@ -21,6 +22,7 @@ public class WeatherServer {
     static class ClimaHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            // Genera datos del clima aleatorio y arma respuesta HTTP
             String response = generarClima();
             exchange.sendResponseHeaders(200, response.length());
             exchange.getResponseBody().write(response.getBytes());
