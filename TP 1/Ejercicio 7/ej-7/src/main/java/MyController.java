@@ -1,19 +1,22 @@
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 //import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.google.gson.Gson;
+
+import org.springframework.boot.SpringApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
 @RestController
 public class MyController {
@@ -34,7 +37,8 @@ public class MyController {
     CreateContainerResponse container = dockerClient.createContainerCmd(DOCKER_IMAGE_NAME)
         .withName(DOCKER_CONTAINER_NAME)
         .withExposedPorts(ExposedPort.tcp(DOCKER_CONTAINER_PORT))
-        .withHostConfig(HostConfig.newHostConfig().withPortBindings(new PortBinding(PortBinding.parse(String.format("%d:%d", DOCKER_CONTAINER_PORT, DOCKER_CONTAINER_PORT)))).withAutoRemove(true))
+       // .withHostConfig(HostConfig.newHostConfig().withPortBindings(new PortBinding(PortBinding.parse(String.format("%d:%d", DOCKER_CONTAINER_PORT, DOCKER_CONTAINER_PORT)))).withAutoRemove(true))
+        .withPortBindings(PortBinding.parse(String.format("%d:%d", DOCKER_CONTAINER_PORT, DOCKER_CONTAINER_PORT)))
         .exec();
 
     // Iniciar el contenedor Docker
@@ -56,7 +60,7 @@ public class MyController {
     }
 
     // Obtener el resultado de la tarea desde el contenedor Docker
-    String result = dockerClient.logContainerCmd(container.getId()).withStdOut(true).exec().toString();
+    String result = dockerClient.logContainerCmd(container.getId()).withStdOut(true).exec(null).toString();
 
     // Eliminar el contenedor Docker
     dockerClient.removeContainerCmd(container.getId()).exec();

@@ -3,8 +3,6 @@ import okhttp3.*;
 
 import java.io.IOException;
 
-import org.apache.tomcat.util.http.parser.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public class MyClient {
 
