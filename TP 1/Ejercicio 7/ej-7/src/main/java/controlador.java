@@ -1,9 +1,7 @@
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.ExecCreateCmdResponse;
 import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
@@ -19,7 +17,7 @@ import java.net.http.HttpResponse;
 
 
 @RestController
-public class MyController {
+public class controlador {
 
   private static final String DOCKER_IMAGE_NAME = "my-docker-image";
   private static final String DOCKER_CONTAINER_NAME = "my-docker-container";
@@ -76,7 +74,7 @@ public class MyController {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(MyController.class, args);
+    SpringApplication.run(controlador.class, args);
   }
 
 }
@@ -110,6 +108,7 @@ public class MyController {
 			String ip = "127.0.0.1";
 			String url = "http://"+ip+":"+randomNum+t.getApiPath()+t.getMethodPath();
 			log.info ("URL:"+url);
+      //crea un cliente que envía una petición POST
 			response = httpManager.PostHttpRequest(url, t.getParameters());
 			
 

@@ -20,18 +20,19 @@ public class HttpRequests {
 
         HttpResponse<String> response = null;
         ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody = objectMapper
-                .writeValueAsString(parametersMap);
+        //arma el cuerpo de la petición, serializando los parámetros (a string)
+        String requestBody = objectMapper.writeValueAsString(parametersMap);
         System.out.println("Request body "+requestBody);
         try {
                 HttpClient client = HttpClient.newHttpClient();
+                //arma la petición con método POST
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(url))
                         .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                         .build();
-        
-                response = client.send(request,
-                        HttpResponse.BodyHandlers.ofString());
+                
+                //se envía la petición sincrónicamente
+                response = client.send(request, HttpResponse.BodyHandlers.ofString());
         
                 System.out.println(response.body());
         } catch (Exception e) {
