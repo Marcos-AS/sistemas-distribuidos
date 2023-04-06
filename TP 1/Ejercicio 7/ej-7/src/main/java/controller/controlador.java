@@ -1,4 +1,10 @@
+package controller;
 import com.google.gson.Gson;
+
+import model.TareaGenerica;
+import services.CmdRunner;
+import services.HttpRequests;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.net.http.HttpResponse;
 import org.springframework.http.HttpStatus;
