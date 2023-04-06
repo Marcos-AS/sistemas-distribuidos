@@ -62,9 +62,3 @@ public class controlador {
 
 
 }
-
-//el cliente le manda una tarea en JSON y el servidor la convierte a un objeto Java 
-//mediante Gson para poder manipular los datos. Luego, vuelve a convertir los datos a
-//formato JSON para enviarle la tarea a un contenedor Docker para que la resuelva
-//Para que el servidor pueda ejecutar tareas en un contenedor Docker, se necesitará una
-// biblioteca Java que permita interactuar con Docker, como Docker Java.
