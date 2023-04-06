@@ -27,4 +27,11 @@ public class TareaGenerica {
     public HashMap<String, String> getParameters() {
         return this.parameters;
     }
+
+    public TareaGenerica(String taskName, String fullContainerImage, HashMap<String, String> parameters) {
+        this.name = taskName;
+        this.fullContainerImage = fullContainerImage;
+        this.parameters = parameters;
+    }  
+
 }

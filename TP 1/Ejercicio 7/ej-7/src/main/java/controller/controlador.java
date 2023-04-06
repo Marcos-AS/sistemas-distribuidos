@@ -11,17 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
+@RequestMapping(value = "/api/taskmanager")
 public class controlador {
   int min = 8000;
   int max = 9999;
   private Gson gson = new Gson();
 
   //método ejecutar tarea remota, las peticiones POST las maneja este método
-  @PostMapping("/executeRemoteTask")
+  @PostMapping("/createTask")
   public ResponseEntity<?> executeRemoteTask(@RequestBody String taskJson) {
     HttpResponse<String> response = null;
     try {
