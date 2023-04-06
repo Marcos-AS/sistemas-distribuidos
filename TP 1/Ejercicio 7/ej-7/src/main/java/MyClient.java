@@ -3,10 +3,12 @@ import okhttp3.*;
 
 import java.io.IOException;
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 public class MyClient {
-
-  private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+  }
+  /* private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
   private static final String URL = "http://localhost:8080/executeRemoteTask";
 
   private static final OkHttpClient client = new OkHttpClient();
@@ -60,4 +62,4 @@ class TareaEjemplo implements TareaGenerica {
   // Getters y setters
 
 }
-
+*/
