@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Cliente {
@@ -13,20 +16,18 @@ public class Cliente {
         Socket socket = new Socket(serverAddress, serverPort);
 
         // Obtiene los flujos de entrada y salida del socket
-        InputStream input = socket.getInputStream();
-        OutputStream output = socket.getOutputStream();
+        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-        // Envía un mensaje de texto al servidor
-        String message = "Hola, servidor";
-        output.write(message.getBytes());
+        String userInput;
+        while ((userInput = stdIn.readLine()) != null) {
+            // Enviar mensaje al servidor
+            output.println(userInput);
 
-        // Lee la respuesta del servidor
-        byte[] buffer = new byte[1024];
-        int bytesRead = input.read(buffer);
-        String response = new String(buffer, 0, bytesRead);
-
-        // Imprime la respuesta del servidor
-        System.out.println(response);
+            // Imprime la respuesta del servidor
+            System.out.println("Respuesta del servidor: " + input.readLine());
+        }
 
         // Cierra el socket
         socket.close();

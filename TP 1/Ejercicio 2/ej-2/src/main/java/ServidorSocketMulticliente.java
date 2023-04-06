@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -35,16 +38,16 @@ public class ServidorSocketMulticliente {
         public void run() {
             try {
                 // Obtiene los flujos de entrada y salida del socket del cliente
-                InputStream input = clientSocket.getInputStream();
-                OutputStream output = clientSocket.getOutputStream();
+                BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                PrintWriter output = new PrintWriter(clientSocket.getOutputStream());
 
-                // Lee los datos del cliente
-                byte[] buffer = new byte[1024];
-                int bytesRead = input.read(buffer);
-                String message = new String(buffer, 0, bytesRead);
 
-                // Repite los datos al cliente
-                output.write(buffer, 0, bytesRead);
+                String inputLine;
+                while ((inputLine = input.readLine()) != null) {
+                    System.out.println("Mensaje recibido: " + inputLine);
+                    // Enviar la respuesta de vuelta al cliente
+                    output.println(inputLine);
+                }
 
                 // Cierra el socket del cliente
                 clientSocket.close();
