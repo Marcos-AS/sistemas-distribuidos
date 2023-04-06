@@ -27,7 +27,7 @@ public class TasksController {
 		Task t = gson.fromJson(task, Task.class);
 		int result = t.addMethod();	
 		log.info ("remote job result: "+result);
-		
+		System.out.println("ejecutando");
         return new ResponseEntity<Integer>(result, HttpStatus.CREATED);
     }
 }

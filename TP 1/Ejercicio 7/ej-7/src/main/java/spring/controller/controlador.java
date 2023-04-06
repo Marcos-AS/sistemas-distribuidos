@@ -50,7 +50,7 @@ public class controlador {
 			}
 
       //3) levanta el contenedor
-      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -p "+randomNum+":8081 "+ task.getFullContainerImage()+" &";
+      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -p "+randomNum+":9091 "+ task.getFullContainerImage()+" &";
       cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", docker_container);
 
       System.out.println("AAAAAAAAAAAA" + task.getApiPath());
