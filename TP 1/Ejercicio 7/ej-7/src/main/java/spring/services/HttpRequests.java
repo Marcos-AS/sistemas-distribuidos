@@ -6,9 +6,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpRequests {
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     
     public void HttpRequests(){
         
@@ -16,9 +18,10 @@ public class HttpRequests {
 
     
     public HttpResponse<String>  PostHttpRequest(String url , HashMap<String, String> parametersMap) throws IOException, InterruptedException {
-
+        log.info("URL: " + url);
+        
         System.out.println("HOLI"+url+"&"+parametersMap);
-
+        
         HttpResponse<String> response = null;
         ObjectMapper objectMapper = new ObjectMapper();
         //arma el cuerpo de la petición, serializando los parámetros (a string)
@@ -31,6 +34,8 @@ public class HttpRequests {
                         .uri(URI.create(url))
                         .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                         .build();
+                
+                System.out.println(request);
                 
                 //se envía la petición sincrónicamente
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());

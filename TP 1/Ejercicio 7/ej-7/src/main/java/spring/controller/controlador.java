@@ -5,7 +5,6 @@ import spring.model.TareaGenerica;
 import spring.services.CmdRunner;
 import spring.services.HttpRequests;
 
-import java.util.concurrent.ThreadLocalRandom;
 import java.net.http.HttpResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +34,8 @@ public class controlador {
       System.out.println(task.getTaskName());
       //2) busca un puerto disponible (num aleatorio entre min y max)
       Boolean port_available = false;
-			int randomNum = 0;
-			while (!port_available) {
+			int randomNum = 8500;
+			/*while (!port_available) {
 				randomNum = ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
 				
 				String result = cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", "ss -tulpn | grep :"+randomNum+" | head -n1");
@@ -48,18 +47,17 @@ public class controlador {
 				}
 				Thread.sleep(2000);
 			}
-
+*/
       //3) levanta el contenedor
-      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -p "+randomNum+":9091 "+ task.getFullContainerImage()+" &";
+
+      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
       cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", docker_container);
 
-      System.out.println("AAAAAAAAAAAA" + task.getApiPath());
       Thread.sleep(5000);
       String ip = "127.0.0.1";
       //apiPath = api/task/example
 			String url = "http://"+ip+":"+randomNum+task.getApiPath()+task.getMethodPath();
-      System.out.println("AAAAAAAAAAAA" + task.getApiPath());
-			//4) crea un cliente que envía una petición POST
+      //4) crea un cliente que envía una petición POST
 			response = httpManager.PostHttpRequest(url, task.getParameters());
   
     } catch (Exception e) {
@@ -69,6 +67,4 @@ public class controlador {
 
     return new ResponseEntity<String>("Tarea almacenada " + response.body().trim(), HttpStatus.CREATED);
   }
-
-
 }

@@ -21,10 +21,10 @@ public class CmdRunner {
         builder.directory(new File(path));
     
 
-        if (this.os.startsWith("Windows")){
+        if (this.os.startsWith("windows")){
             builder.command("cmd.exe", "/c", command); 
         }else{
-            builder.command("sh", "-c", command);
+            builder.command("/bin/sh", "-c", command);
         }
         
 
