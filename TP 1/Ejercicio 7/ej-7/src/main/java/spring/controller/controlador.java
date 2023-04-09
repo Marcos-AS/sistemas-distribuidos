@@ -6,6 +6,8 @@ import spring.services.CmdRunner;
 import spring.services.HttpRequests;
 
 import java.net.http.HttpResponse;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +37,7 @@ public class controlador {
       //2) busca un puerto disponible (num aleatorio entre min y max)
       Boolean port_available = false;
 			int randomNum = 8500;
-			/*while (!port_available) {
+			while (!port_available) {
 				randomNum = ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
 				
 				String result = cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", "ss -tulpn | grep :"+randomNum+" | head -n1");
@@ -47,7 +49,7 @@ public class controlador {
 				}
 				Thread.sleep(2000);
 			}
-*/
+
       //3) levanta el contenedor
 
       String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
