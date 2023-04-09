@@ -21,7 +21,7 @@ public class ServidorVector {
         // http://localhost:8080/vector/resta?a=1,2,3&b=4,5,6
     }
 
-    static class VectorHandler implements HttpHandler {
+    /*static class VectorHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
             String query = t.getRequestURI().getQuery();
@@ -58,7 +58,66 @@ public class ServidorVector {
             os.close();
             
         }
+    } */
+
+    static class VectorHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange t) throws IOException {
+    String query = t.getRequestURI().getQuery();
+    String[] aValues = parseVector(query, "a");
+    String[] bValues = parseVector(query, "b");
+    int[] a = new int[aValues.length];
+    int[] b = new int[bValues.length];
+    for (int i = 0; i < aValues.length; i++) {
+        a[i] = Integer.parseInt(aValues[i]);
     }
+    for (int i = 0; i < bValues.length; i++) {
+        b[i] = Integer.parseInt(bValues[i]);
+    }
+    String op = t.getRequestURI().getPath().split("/")[2];
+    int[] result;
+
+    // Convertir los vectores a una cadena para mostrarlos en el navegador
+    String aStr = Arrays.toString(a);
+    String bStr = Arrays.toString(b);
+
+    // Construir la respuesta que se enviará al navegador
+    String response = "<html><body>" +
+                      "<h1>Valores de los vectores:</h1>" +
+                      "<p>Vector A: " + aStr + "</p>" +
+                      "<p>Vector B: " + bStr + "</p>";
+
+    // Realizar la operación correspondiente
+    // Introducir error: multiplicar el primer elemento del vector a por 10
+    a[0] *= 10;
+    if (op.equals("suma")) {
+        result = sumVectors(a, b);
+        response += "<h1>Resultado de la suma:</h1>";
+    } else if (op.equals("resta")) {
+        result = subtractVectors(a, b);
+        response += "<h1>Resultado de la resta:</h1>";
+    } else {
+        response = "Operación no soportada.";
+        t.sendResponseHeaders(400, response.length());
+        OutputStream os = t.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
+        return;
+    }
+
+    // Convertir el resultado a una cadena y agregarlo a la respuesta
+    String resultStr = Arrays.toString(result);
+    response += "<p>" + resultStr + "</p>" +
+                "</body></html>";
+
+    // Enviar la respuesta al navegador
+    t.sendResponseHeaders(200, response.length());
+    OutputStream os = t.getResponseBody();
+    os.write(response.getBytes());
+    os.close();
+    }
+}
+
 
     private static String[] parseVector(String query, String vectorName) {
         String[] values = query.split("&");
