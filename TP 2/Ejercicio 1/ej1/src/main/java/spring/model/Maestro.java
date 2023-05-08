@@ -90,7 +90,7 @@ public class Maestro {
             // Manejar la excepción en caso de error
             System.err.println("Error al enviar los resultados: " + e.getMessage());
         }
-    }
+    } 
            
     // Métodos para añadir y quitar nodos extremos, getters y setters
     public void añadirNodoExtremo(Nodo nodoExtremo) {
