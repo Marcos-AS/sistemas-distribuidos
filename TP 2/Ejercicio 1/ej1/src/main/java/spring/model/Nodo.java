@@ -1,6 +1,8 @@
 package spring.model;
 
-public class Nodo {
+import java.io.Serializable;
+
+public class Nodo implements Serializable{
     private String direccionIp;
     private int puerto;
 
@@ -8,13 +10,14 @@ public class Nodo {
         this.direccionIp = direccionIp;
         this.puerto = puerto;
     }
+
     // Constructor, getters y setters
 
-    public String getDireccionIpNodoExtremo() {
+    public String getDireccionIp() {
         return this.direccionIp;
     }
 
-    public int getPuertoNodoExtremo() {
+    public int getPuerto() {
         return this.puerto;
     }
 }

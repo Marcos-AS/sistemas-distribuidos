@@ -1,53 +1,129 @@
 package spring.model;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Extremo {
-    private List<String> maestros;
-    private Map<String, List<Recurso>> recursosPropios;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-    public Extremo(List<String> maestros) {
+public class Extremo extends Nodo{
+    private List<Maestro> maestros;
+    private List<String> recursosPropios;
+
+    public Extremo(List<Maestro> maestros, String direccinIp, int puerto) {
+        super(direccinIp, puerto);
         this.maestros = maestros;
+        this.recursosPropios = new ArrayList<String>();
     }
 
     public void iniciar() {
         // Establecer conexión con el nodo maestro
-        String nodoMaestro = maestros.get(0); // Tomamos el primer nodo maestro
-        List<Recurso> recursosDisponibles = obtenerRecursosDeMaestro(nodoMaestro);
-
+        Nodo nodoMaestro = maestros.get(0); // Tomamos el primer nodo maestro
+       
+        informarMaestro(nodoMaestro);
+        
+        //List<Recurso> recursosDisponibles = obtenerRecursosDeMaestro(nodoMaestro);
+        
         // Mostrar lista de recursos disponibles al usuario
-        mostrarRecursosDisponibles(recursosDisponibles);
+        //mostrarRecursosDisponibles(recursosDisponibles);
 
         // El usuario selecciona los recursos a descargar
-        List<Recurso> recursosSeleccionados = seleccionarRecursos(recursosDisponibles);
+        //List<Recurso> recursosSeleccionados = seleccionarRecursos(recursosDisponibles);
 
         // Enviar solicitud al nodo maestro con la información de los recursos seleccionados
-        List<Par> paresCorrespondientes = buscarParesCorrespondientes(nodoMaestro, recursosSeleccionados);
+        //List<Par> paresCorrespondientes = buscarParesCorrespondientes(nodoMaestro, recursosSeleccionados);
 
         // Descargar archivos de los pares correspondientes
-        descargarArchivos(paresCorrespondientes);
+        //descargarArchivos(paresCorrespondientes);
     }
 
-    public List<Recurso> obtenerRecursosDeMaestro(String nodoMaestro) {
-        // Código para establecer conexión con el nodo maestro y obtener la lista de recursos disponibles
-        // Ejemplo:
+    private void informarMaestro(Nodo nodoMaestro) {
+        
         try {
-            Socket socketMaestro = new Socket(nodoMaestro, 1234);
-            // Enviar consulta al nodo maestro
-            // Recibir respuesta del nodo maestro con la lista de recursos disponibles
-            // Cerrar conexión con el nodo maestro
+            // establish a connection with the Maestro node
+            Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
+
+            // Send a message to register the Extremo in the list of nodes
+            ObjectOutputStream outputStream = new ObjectOutputStream(socketMaestro.getOutputStream());
+           // outputStream.writeObject(new Nodo(this.getDireccionIp(), this.getPuerto()));
+
+            // Send a list of available files to share
+            outputStream.writeObject(new MensajeListaArchivos(new Nodo(this.getDireccionIp(), this.getPuerto()), listaArchivosDisponibles()));
+
+            // Close the connection
+            outputStream.close();
+            socketMaestro.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
     }
+
+    public List<String> listaArchivosDisponibles() {
+        File carpetaArchivos = new File("C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model/");
+        File[] archivos = carpetaArchivos.listFiles();
+        for (File archivo : archivos) {
+            if (archivo.isFile()) {
+                recursosPropios.add(archivo.getName());
+            }
+        }
+        return recursosPropios;
+    }
+    
+    public List<Recurso> obtenerRecursosDeMaestro(Nodo nodoMaestro) {
+        List<Recurso> recursos = new ArrayList<>();
+    
+        try {
+            // establish a connection with the Maestro node
+            Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
+    
+            // send a request to the Maestro node for the list of available resources
+            OutputStream out = socketMaestro.getOutputStream();
+            out.write("GET /maestro/recursos HTTP/1.1\r\n".getBytes());
+            out.write(("Host: " + nodoMaestro + "\r\n").getBytes());
+            out.write("Connection: close\r\n".getBytes());
+            out.write("\r\n".getBytes());
+    
+            // read the response from the Maestro node and parse the list of resources
+            InputStream in = socketMaestro.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            boolean headersRead = false;
+            while ((line = reader.readLine()) != null) {
+                if (!headersRead) {
+                    // skip the HTTP response headers
+                    if (line.isEmpty()) {
+                        headersRead = true;
+                    }
+                } else {
+                    // parse the list of resources from the response body
+                    Gson gson = new Gson();
+                    java.lang.reflect.Type type = new TypeToken<List<Recurso>>(){}.getType();
+                    recursos = gson.fromJson(line, type);
+                }
+            }
+    
+            // close the connection with the Maestro node
+            socketMaestro.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        return recursos;
+    }
+    
 
     public void mostrarRecursosDisponibles(List<Recurso> recursosDisponibles) {
         // Código para mostrar la lista de recursos disponibles al usuario
@@ -65,11 +141,11 @@ public class Extremo {
         return recursosSeleccionados;
     }
 
-    private List<Par> buscarParesCorrespondientes(String nodoMaestro, List<Recurso> recursosSeleccionados) {
+    private List<Par> buscarParesCorrespondientes(Nodo nodoMaestro, List<Recurso> recursosSeleccionados) {
         List<Par> paresCorrespondientes = new ArrayList<>();
         try {
             // Crear conexión con el nodo maestro
-            Socket socket = new Socket(nodoMaestro, 8000);
+            Socket socket = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
     
             // Enviar solicitud al nodo maestro
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());

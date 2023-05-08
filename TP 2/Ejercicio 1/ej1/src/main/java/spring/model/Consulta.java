@@ -1,11 +1,5 @@
 package spring.model;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-
 public class Consulta {
     private String consulta;
     public String direccionIpExtremo;

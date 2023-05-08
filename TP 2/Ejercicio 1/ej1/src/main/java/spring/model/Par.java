@@ -1,7 +1,5 @@
 package spring.model;
 
-import java.util.List;
-
 public class Par {
     private String direccionIP;
     private int puerto;

@@ -22,16 +22,25 @@ public class App
         SpringApplication.run(App.class, args);
 
         // Iniciar nodo maestro
-        List<Nodo> extremos = new ArrayList<>();
-        Nodo nodo1 = new Nodo("localhost", 8081);
-        Nodo nodo2 = new Nodo("localhost", 8081);
-        Maestro maestro = new Maestro(extremos);
+        //List<Nodo> extremos = new ArrayList<>();
+        //Nodo nodo1 = new Nodo("localhost", 8081);
+        //Nodo nodo2 = new Nodo("localhost", 8082);
+        //extremos.add(nodo1);
+        //extremos.add(nodo2);
+        Maestro maestro = new Maestro("localhost", 9000);
         maestro.iniciar();
 
-        // Iniciar nodo extremo
-        List<String> maestros = new ArrayList<>();
-        maestros.add("localhost:8080");
-        Extremo extremo = new Extremo(maestros);
-        extremo.iniciar();
+        // Iniciar nodo extremo 1
+        List<Maestro> maestros = new ArrayList<>();
+       // Nodo nodo3 = new Nodo("localhost", 8083);     
+        maestros.add(maestro);   
+        Extremo extremo1 = new Extremo(maestros, "localhost", 8082 );
+        extremo1.iniciar();
+
+        // Iniciar nodo extremo 2
+        Extremo extremo2 = new Extremo(maestros, "localhost", 8083 );
+        extremo2.iniciar();
+
+        maestro.mostrarRecursos();
     }
 }

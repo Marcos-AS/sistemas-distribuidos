@@ -6,15 +6,22 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Maestro {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Maestro extends Nodo{
     private List<Nodo> nodosExtremos;
-    public static final int PUERTO_MAESTRO = 8000;
-    public List<Recurso> recursosDisponibles;
+    private Map<Nodo, List<String>> recursosPorExtremo;
 
-    public Maestro(List<Nodo> nodosExtremos) {
-        this.nodosExtremos = nodosExtremos;
+    @Autowired
+    public Maestro(String direccionIp, int puerto) {
+        super(direccionIp, puerto);
+        this.recursosPorExtremo = new HashMap<Nodo, List<String>>(); 
     }
 
     public void gestionarES() throws ClassNotFoundException, IOException {
@@ -33,7 +40,7 @@ public class Maestro {
 
     public Consulta recibirConsulta() throws IOException, ClassNotFoundException {
         // Crear el socket del servidor y esperar a que llegue una conexión de un nodo extremo
-        ServerSocket servidorSocket = new ServerSocket(PUERTO_MAESTRO);
+        ServerSocket servidorSocket = new ServerSocket();
         Socket socket = servidorSocket.accept();
     
         // Leer la consulta del objeto enviado por el nodo extremo
@@ -55,7 +62,7 @@ public class Maestro {
         for (Nodo nodo : nodosExtremos) {
             try {
                 // Conectar con el nodo extremo y enviar la consulta
-                Socket socket = new Socket(nodo.getDireccionIpNodoExtremo(), nodo.getPuertoNodoExtremo());
+                Socket socket = new Socket(nodo.getDireccionIp(), nodo.getPuerto());
                 ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
                 salida.writeObject(consulta);
     
@@ -107,13 +114,67 @@ public class Maestro {
     }
 
     public List<Recurso> getRecursosDisponibles() {
-        return this.recursosDisponibles;
+      //  return this.recursosDisponibles;
+      return null;
     }
 
     public void actualizarRecursos(List<Recurso> recursos) {
-        this.recursosDisponibles = recursos;
+      //  this.recursosDisponibles = recursos;
     }
 
     public void iniciar() {
+        // start the Maestro node here
+        // for example, you could create a new thread to handle incoming requests
+
+        Thread serverThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ServerSocket serverSocket = new ServerSocket(getPuerto());
+
+                    while (true) {
+                        Socket socketExtremo = serverSocket.accept();
+        
+                        // Atender solicitud del extremo
+                        ObjectInputStream inputStream = new ObjectInputStream(socketExtremo.getInputStream());
+                        Object mensaje = inputStream.readObject();
+        
+                       /* if (mensaje instanceof Nodo) {
+                            // Registrar nuevo extremo
+                            Nodo nodoExtremo = (Nodo) mensaje;
+                            nodosExtremos.add(nodoExtremo);
+                            System.out.println("Se ha registrado el extremo " + nodoExtremo.getDireccionIp() + ":" + nodoExtremo.getPuerto()); */
+                        if (mensaje instanceof MensajeListaArchivos) {
+                            // Actualizar lista de archivos disponibles
+                            MensajeListaArchivos nodoLista = (MensajeListaArchivos) mensaje;
+                            recursosPorExtremo.put(nodoLista.getNodoExtremo(), nodoLista.getListaArchivos());
+                            System.out.println("El extremo " + nodoLista.getNodoExtremo().getDireccionIp() + ":" + nodoLista.getNodoExtremo().getPuerto() + " ha compartido " + nodoLista.getListaArchivos().size() + " archivos.");
+                        }
+        
+                        // Cerrar conexión
+                        inputStream.close();
+                        socketExtremo.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        serverThread.start();
+    }
+
+    public void mostrarRecursos() {
+        // Iteramos sobre las listas de cada clave
+        for (Nodo clave : recursosPorExtremo.keySet()) {
+            System.out.println("Clave: " + clave.getDireccionIp() + ": " + clave.getPuerto());
+            List<String> lista = recursosPorExtremo.get(clave);
+            for (String valor : lista) {
+                System.out.println("Valor: " + valor);
+            }
+        }
     }
 }
