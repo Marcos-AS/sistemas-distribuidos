@@ -1,12 +1,13 @@
 package spring.model;
 
-import java.util.List;
-
 public class Nodo {
     private String direccionIp;
     private int puerto;
-    private List<Recurso> recursos;
 
+    public Nodo(String direccionIp, int puerto) {
+        this.direccionIp = direccionIp;
+        this.puerto = puerto;
+    }
     // Constructor, getters y setters
 
     public String getDireccionIpNodoExtremo() {

@@ -11,6 +11,11 @@ import java.util.List;
 public class Maestro {
     private List<Nodo> nodosExtremos;
     public static final int PUERTO_MAESTRO = 8000;
+    public List<Recurso> recursosDisponibles;
+
+    public Maestro(List<Nodo> nodosExtremos) {
+        this.nodosExtremos = nodosExtremos;
+    }
 
     public void gestionarES() throws ClassNotFoundException, IOException {
         // Implementar la lógica para gestionar la E/S de los peers
@@ -99,5 +104,16 @@ public class Maestro {
     
     public void quitarNodoExtremo(Nodo nodoExtremo) {
         nodosExtremos.remove(nodoExtremo);
+    }
+
+    public List<Recurso> getRecursosDisponibles() {
+        return this.recursosDisponibles;
+    }
+
+    public void actualizarRecursos(List<Recurso> recursos) {
+        this.recursosDisponibles = recursos;
+    }
+
+    public void iniciar() {
     }
 }

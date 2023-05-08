@@ -1,20 +1,43 @@
 package spring.controller;
 
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import spring.model.Maestro;
+import spring.model.Nodo;
+import spring.model.Recurso;
+
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+@Controller
+@RequestMapping("/maestro")
+public class MasterServerController {
 
-@RestController
-public class MasterServerController  {
-    
-    @GetMapping("/resources")
-    public List<String> getResources() {
-        // Lógica para obtener los recursos disponibles en el servidor maestro
-        List<String> resources = new ArrayList<>();
-        resources.add("archivo1.txt");
-        resources.add("archivo2.txt");
-        return resources;
+    @Autowired
+    private Maestro maestro;
+
+    @GetMapping("/recursos")
+    @ResponseBody
+    public List<Recurso> obtenerRecursosDisponibles() {
+        return maestro.getRecursosDisponibles();
+    }
+
+    @PostMapping("/registrar")
+    @ResponseBody
+    public void registrarNodo(@RequestParam Nodo nodo) {
+        maestro.añadirNodoExtremo(nodo);
+    }
+
+    @PostMapping("/actualizar")
+    @ResponseBody
+    public void actualizarRecursos(@RequestBody List<Recurso> recursos) {
+        maestro.actualizarRecursos(recursos);
+    }
+
+    @PostMapping("/eliminar")
+    @ResponseBody
+    public void eliminarNodo(@RequestParam Nodo nodo) {
+        maestro.quitarNodoExtremo(nodo);
     }
 }

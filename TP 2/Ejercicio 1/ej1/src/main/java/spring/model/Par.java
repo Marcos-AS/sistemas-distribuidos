@@ -5,12 +5,26 @@ import java.util.List;
 public class Par {
     private String direccionIP;
     private int puerto;
-    private List<Recurso> recursos;
+    private String nombreArchivo;
 
     // constructor, getters y setters
 
-    public void agregarRecurso(Recurso recurso) {
-        recursos.add(recurso);
+    public Par(String direccionIP, int puerto, String nombreArchivo) {
+        this.direccionIP = direccionIP;
+        this.puerto = puerto;
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    public String getDireccionIp() {
+        return this.direccionIP;
+    }
+
+    public int getPuerto() {
+        return this.puerto;
+    }
+
+    public String getNombreArchivo() {
+        return this.nombreArchivo;
     }
 
     public void atenderSolicitud(Solicitud solicitud) {
