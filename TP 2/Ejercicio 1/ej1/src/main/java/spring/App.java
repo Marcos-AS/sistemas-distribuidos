@@ -20,6 +20,9 @@ public class App
     public static void main( String[] args )
     {
         SpringApplication.run(App.class, args);
+        //String rutaParaExtremo = "C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model/";
+        String rutaParaExtremo1 = "C:/Users/marco/OneDrive/Documentos/unlu-sdpp-tps-remote/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model";
+        String rutaParaExtremo2 = "C:/Users/marco/OneDrive/Documentos/unlu-sdpp-tps-remote/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/controller";
 
         // Iniciar nodo maestro
         //List<Nodo> extremos = new ArrayList<>();
@@ -27,18 +30,17 @@ public class App
         //Nodo nodo2 = new Nodo("localhost", 8082);
         //extremos.add(nodo1);
         //extremos.add(nodo2);
-        Maestro maestro = new Maestro("localhost", 9000);
-        maestro.iniciar();
-
+        Maestro maestro = new Maestro("localhost", 8080);
+        
         // Iniciar nodo extremo 1
         List<Maestro> maestros = new ArrayList<>();
        // Nodo nodo3 = new Nodo("localhost", 8083);     
         maestros.add(maestro);   
-        Extremo extremo1 = new Extremo(maestros, "localhost", 8082, "C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model/" );
+        Extremo extremo1 = new Extremo(maestros, "localhost", 8082, rutaParaExtremo1);
         extremo1.iniciar();
 
         // Iniciar nodo extremo 2
-        Extremo extremo2 = new Extremo(maestros, "localhost", 8083, "C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/controller/" );
+        Extremo extremo2 = new Extremo(maestros, "localhost", 8083, rutaParaExtremo2);
         extremo2.iniciar();
 
         maestro.mostrarRecursos();

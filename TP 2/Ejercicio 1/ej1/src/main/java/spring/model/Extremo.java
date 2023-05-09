@@ -16,6 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.dockerjava.transport.DockerHttpClient.Request;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -23,6 +34,9 @@ public class Extremo extends Nodo{
     private List<Maestro> maestros;
     private List<String> recursosPropios;
     private String rutaArchivos;
+
+    //para enviar peticiones
+    RestTemplate restTemplate = new RestTemplate();
 
     public Extremo(List<Maestro> maestros, String direccinIp, int puerto, String rutaArchivos) {
         super(direccinIp, puerto);
@@ -42,18 +56,41 @@ public class Extremo extends Nodo{
         
         try {
             // establish a connection with the Maestro node
-            Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
+            //Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
 
             // Send a message to register the Extremo in the list of nodes
-            ObjectOutputStream outputStream = new ObjectOutputStream(socketMaestro.getOutputStream());
+            //ObjectOutputStream outputStream = new ObjectOutputStream(socketMaestro.getOutputStream());
            // outputStream.writeObject(new Nodo(this.getDireccionIp(), this.getPuerto()));
 
+
             // Send a list of available files to share
-            outputStream.writeObject(new MensajeListaArchivos(new Nodo(this.getDireccionIp(), this.getPuerto()), listaArchivosDisponibles()));
+            //outputStream.writeObject(new MensajeListaArchivos(new Nodo(this.getDireccionIp(), this.getPuerto()), listaArchivosDisponibles()));
+
+            MensajeListaArchivos mensajeInicial = new MensajeListaArchivos(new Nodo(this.getDireccionIp(), this.getPuerto()), listaArchivosDisponibles());
+            
+            // Set the request headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Serialize the request body to JSON
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            String jsonBody = mapper.writeValueAsString(mensajeInicial);
+
+            // Create the request entity with the body and headers
+            HttpEntity<MensajeListaArchivos> requestEntity = new HttpEntity<>(mensajeInicial, headers);
+
+            // Send the POST request and get the response entity
+            restTemplate.postForEntity("http://"+ nodoMaestro.getDireccionIp() +":"+ nodoMaestro.getPuerto()+"/maestro/iniciar", requestEntity, Void.class);
+
+            // Check the response status code
+            // if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            //     System.out.println("POST request sent successfully");
 
             // Close the connection
-            outputStream.close();
-            socketMaestro.close();
+            //outputStream.close();
+            //socketMaestro.close();
 
         } catch (Exception e) {
             e.printStackTrace();

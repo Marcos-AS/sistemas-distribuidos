@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 public class Maestro extends Nodo{
@@ -122,22 +124,22 @@ public class Maestro extends Nodo{
       //  this.recursosDisponibles = recursos;
     }
 
-    public void iniciar() {
+    public void iniciar(@RequestBody MensajeListaArchivos mensaje) {
         // start the Maestro node here
         // for example, you could create a new thread to handle incoming requests
         
-        Thread serverThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ServerSocket serverSocket = new ServerSocket(getPuerto());
+        // Thread serverThread = new Thread(new Runnable() {
+        //     @Override
+        //     public void run() {
+        //         try {
+        //             ServerSocket serverSocket = new ServerSocket(getPuerto());
 
-                    while (true) {
-                        Socket socketExtremo = serverSocket.accept();
+        //             while (true) {
+        //                 Socket socketExtremo = serverSocket.accept();
         
-                        // Atender solicitud del extremo
-                        ObjectInputStream inputStream = new ObjectInputStream(socketExtremo.getInputStream());
-                        Object mensaje = inputStream.readObject();
+        //                 // Atender solicitud del extremo
+        //                 ObjectInputStream inputStream = new ObjectInputStream(socketExtremo.getInputStream());
+        //                 Object mensaje = inputStream.readObject();
         
                        /* if (mensaje instanceof Nodo) {
                             // Registrar nuevo extremo
@@ -152,19 +154,19 @@ public class Maestro extends Nodo{
                         }
         
                         // Cerrar conexión
-                        inputStream.close();
-                        socketExtremo.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
+        //                 inputStream.close();
+        //                 socketExtremo.close();
+        //             }
+        //         } catch (IOException e) {
+        //             e.printStackTrace();
+        //         } catch (ClassNotFoundException e) {
+        //             // TODO Auto-generated catch block
+        //             e.printStackTrace();
+        //         }
+        //     }
+        // });
 
-        serverThread.start();        
+        // serverThread.start();        
     }
 
     public void mostrarRecursos() {
