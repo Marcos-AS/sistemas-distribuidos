@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -21,11 +22,13 @@ import com.google.gson.reflect.TypeToken;
 public class Extremo extends Nodo{
     private List<Maestro> maestros;
     private List<String> recursosPropios;
+    private String rutaArchivos;
 
-    public Extremo(List<Maestro> maestros, String direccinIp, int puerto) {
+    public Extremo(List<Maestro> maestros, String direccinIp, int puerto, String rutaArchivos) {
         super(direccinIp, puerto);
         this.maestros = maestros;
         this.recursosPropios = new ArrayList<String>();
+        this.rutaArchivos = rutaArchivos;
     }
 
     public void iniciar() {
@@ -33,20 +36,6 @@ public class Extremo extends Nodo{
         Nodo nodoMaestro = maestros.get(0); // Tomamos el primer nodo maestro
        
         informarMaestro(nodoMaestro);
-        
-        //List<Recurso> recursosDisponibles = obtenerRecursosDeMaestro(nodoMaestro);
-        
-        // Mostrar lista de recursos disponibles al usuario
-        //mostrarRecursosDisponibles(recursosDisponibles);
-
-        // El usuario selecciona los recursos a descargar
-        //List<Recurso> recursosSeleccionados = seleccionarRecursos(recursosDisponibles);
-
-        // Enviar solicitud al nodo maestro con la información de los recursos seleccionados
-        //List<Par> paresCorrespondientes = buscarParesCorrespondientes(nodoMaestro, recursosSeleccionados);
-
-        // Descargar archivos de los pares correspondientes
-        //descargarArchivos(paresCorrespondientes);
     }
 
     private void informarMaestro(Nodo nodoMaestro) {
@@ -71,8 +60,36 @@ public class Extremo extends Nodo{
         }
     }
 
+    public Nodo consultar(String archivo) {
+
+        Maestro nodoMaestro = maestros.get(0);
+
+        try {
+            // establish a connection with the Maestro node
+            Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
+
+            ObjectOutputStream outputStream = new ObjectOutputStream(socketMaestro.getOutputStream());
+            ObjectInputStream inputStream = new ObjectInputStream(socketMaestro.getInputStream());
+
+            outputStream.writeObject(new Consulta(archivo));
+
+            Object respuesta = inputStream.readObject();
+
+            // Close the connection
+            outputStream.close();
+            socketMaestro.close();
+
+            return (Nodo) respuesta;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public List<String> listaArchivosDisponibles() {
-        File carpetaArchivos = new File("C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model/");
+        File carpetaArchivos = new File(rutaArchivos);
         File[] archivos = carpetaArchivos.listFiles();
         for (File archivo : archivos) {
             if (archivo.isFile()) {
@@ -221,4 +238,7 @@ public class Extremo extends Nodo{
     public void atenderSolicitud(Solicitud solicitud) {
         // Código para buscar si se tienen los recursos requeridos y devolver la información correspondiente
     }
+
+
+    
 }

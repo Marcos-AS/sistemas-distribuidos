@@ -34,7 +34,7 @@ public class Maestro extends Nodo{
             List<Recurso> resultados = buscarRecursos(consulta);
     
             // Devolver los resultados al nodo extremo que hizo la consulta
-            enviarResultados(resultados, consulta.getDireccionIpNodoExtremo(), consulta.getPuertoNodoExtremo());
+           // enviarResultados(resultados, consulta.getDireccionIpNodoExtremo(), consulta.getPuertoNodoExtremo());
         }
     }
 
@@ -125,7 +125,7 @@ public class Maestro extends Nodo{
     public void iniciar() {
         // start the Maestro node here
         // for example, you could create a new thread to handle incoming requests
-
+        
         Thread serverThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -144,7 +144,7 @@ public class Maestro extends Nodo{
                             Nodo nodoExtremo = (Nodo) mensaje;
                             nodosExtremos.add(nodoExtremo);
                             System.out.println("Se ha registrado el extremo " + nodoExtremo.getDireccionIp() + ":" + nodoExtremo.getPuerto()); */
-                        if (mensaje instanceof MensajeListaArchivos) {
+                       if (mensaje instanceof MensajeListaArchivos) {
                             // Actualizar lista de archivos disponibles
                             MensajeListaArchivos nodoLista = (MensajeListaArchivos) mensaje;
                             recursosPorExtremo.put(nodoLista.getNodoExtremo(), nodoLista.getListaArchivos());
@@ -164,7 +164,7 @@ public class Maestro extends Nodo{
             }
         });
 
-        serverThread.start();
+        serverThread.start();        
     }
 
     public void mostrarRecursos() {

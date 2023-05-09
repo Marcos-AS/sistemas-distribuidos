@@ -34,13 +34,15 @@ public class App
         List<Maestro> maestros = new ArrayList<>();
        // Nodo nodo3 = new Nodo("localhost", 8083);     
         maestros.add(maestro);   
-        Extremo extremo1 = new Extremo(maestros, "localhost", 8082 );
+        Extremo extremo1 = new Extremo(maestros, "localhost", 8082, "C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/model/" );
         extremo1.iniciar();
 
         // Iniciar nodo extremo 2
-        Extremo extremo2 = new Extremo(maestros, "localhost", 8083 );
+        Extremo extremo2 = new Extremo(maestros, "localhost", 8083, "C:/Users/leo_2/OneDrive/Documentos/GitHub/sistemas-distribuidos/TP 2/Ejercicio 1/ej1/src/main/java/spring/controller/" );
         extremo2.iniciar();
 
         maestro.mostrarRecursos();
+
+        extremo1.consultar("MasterServerController.java");
     }
 }
