@@ -11,18 +11,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
-public class Maestro extends Nodo{
+public class Maestro{
     private List<Nodo> nodosExtremos;
     private Map<Nodo, List<String>> recursosPorExtremo;
 
     @Autowired
-    public Maestro(String direccionIp, int puerto) {
-        super(direccionIp, puerto);
+    private JdbcTemplate jdbcTemplate;
+
+    public Maestro() {
         this.recursosPorExtremo = new HashMap<Nodo, List<String>>(); 
     }
 
@@ -124,49 +125,27 @@ public class Maestro extends Nodo{
       //  this.recursosDisponibles = recursos;
     }
 
-    public void iniciar(@RequestBody MensajeListaArchivos mensaje) {
-        // start the Maestro node here
-        // for example, you could create a new thread to handle incoming requests
-        
-        // Thread serverThread = new Thread(new Runnable() {
-        //     @Override
-        //     public void run() {
-        //         try {
-        //             ServerSocket serverSocket = new ServerSocket(getPuerto());
-
-        //             while (true) {
-        //                 Socket socketExtremo = serverSocket.accept();
-        
-        //                 // Atender solicitud del extremo
-        //                 ObjectInputStream inputStream = new ObjectInputStream(socketExtremo.getInputStream());
-        //                 Object mensaje = inputStream.readObject();
-        
-                       /* if (mensaje instanceof Nodo) {
-                            // Registrar nuevo extremo
-                            Nodo nodoExtremo = (Nodo) mensaje;
-                            nodosExtremos.add(nodoExtremo);
-                            System.out.println("Se ha registrado el extremo " + nodoExtremo.getDireccionIp() + ":" + nodoExtremo.getPuerto()); */
-                       if (mensaje instanceof MensajeListaArchivos) {
-                            // Actualizar lista de archivos disponibles
-                            MensajeListaArchivos nodoLista = (MensajeListaArchivos) mensaje;
-                            recursosPorExtremo.put(nodoLista.getNodoExtremo(), nodoLista.getListaArchivos());
-                            System.out.println("El extremo " + nodoLista.getNodoExtremo().getDireccionIp() + ":" + nodoLista.getNodoExtremo().getPuerto() + " ha compartido " + nodoLista.getListaArchivos().size() + " archivos.");
-                        }
-        
-                        // Cerrar conexión
-        //                 inputStream.close();
-        //                 socketExtremo.close();
-        //             }
-        //         } catch (IOException e) {
-        //             e.printStackTrace();
-        //         } catch (ClassNotFoundException e) {
-        //             // TODO Auto-generated catch block
-        //             e.printStackTrace();
-        //         }
-        //     }
-        // });
-
-        // serverThread.start();        
+    public void cargar(@RequestBody MensajeListaArchivos mensaje) {
+        try {
+            String sql = "INSERT INTO Extremo (direccionIp, puerto) VALUES (?, ?)";
+            jdbcTemplate.update(sql, mensaje.getNodoExtremo().getDireccionIp(), mensaje.getNodoExtremo().getPuerto());
+            System.out.println("INSERT realizado.");
+            /*sql = "INSERT INTO archivo (nombre, magicNumber) VALUES (?, ?)";
+            jdbcTemplate.update(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    String nombre = mensaje.getListaArchivos().get(i);
+                    ps.setString(1, nombre);
+                   // ps.setInt(2, magicNumber);
+                }
+                @Override
+                public int getBatchSize() {
+                    return mensaje.getListaArchivos().size();
+                }
+            });*/
+            } catch (Exception e) {
+                System.out.println(e);
+            }   
     }
 
     public void mostrarRecursos() {

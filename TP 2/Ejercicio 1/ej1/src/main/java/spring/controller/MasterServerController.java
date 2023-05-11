@@ -1,7 +1,7 @@
 package spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import spring.model.Maestro;
@@ -9,18 +9,20 @@ import spring.model.MensajeListaArchivos;
 import spring.model.Nodo;
 import spring.model.Recurso;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/maestro")
 public class MasterServerController {
 
+    @Autowired
     private Maestro maestro;
-
+        
     public MasterServerController() {
-        int puerto = 8081;
-        String IP = "localhost";
-        this.maestro = new Maestro(IP, puerto); 
     }
 
     @GetMapping("/recursos")
@@ -29,12 +31,11 @@ public class MasterServerController {
         return maestro.getRecursosDisponibles();
     }
 
-    @PostMapping("/iniciar")
-    public void iniciarMaestro(@RequestBody MensajeListaArchivos mensaje) {
-        maestro.iniciar(mensaje);
+    @PostMapping("/informar")
+    public void cargarExtremo(@RequestBody MensajeListaArchivos mensaje) throws SQLException {
+        maestro.cargar(mensaje);
     }
     
-
     @PostMapping("/registrar")
     @ResponseBody
     public void registrarNodo(@RequestParam Nodo nodo) {
@@ -52,4 +53,5 @@ public class MasterServerController {
     public void eliminarNodo(@RequestParam Nodo nodo) {
         maestro.quitarNodoExtremo(nodo);
     }
+
 }

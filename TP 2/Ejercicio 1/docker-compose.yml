@@ -1,0 +1,28 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+  
+  flyway:
+    image: flyway/flyway
+    command: ["-url=jdbc:mariadb://db:3306/maestro", "-user=root", "-password=example", "migrate"]
+    volumes:
+      - ./sql:/flyway/sql
+    depends_on:
+      - db
+    links:
+      - db

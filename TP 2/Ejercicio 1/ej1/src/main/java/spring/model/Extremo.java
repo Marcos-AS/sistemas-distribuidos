@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,24 +32,24 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 public class Extremo extends Nodo{
-    private List<Maestro> maestros;
+    private List<Nodo> maestros;
     private List<String> recursosPropios;
     private String rutaArchivos;
 
     //para enviar peticiones
     RestTemplate restTemplate = new RestTemplate();
 
-    public Extremo(List<Maestro> maestros, String direccinIp, int puerto, String rutaArchivos) {
+    public Extremo(List<Nodo> maestros, String direccinIp, int puerto, String rutaArchivos) {
         super(direccinIp, puerto);
         this.maestros = maestros;
         this.recursosPropios = new ArrayList<String>();
         this.rutaArchivos = rutaArchivos;
     }
 
-    public void iniciar() {
+    public void iniciar() throws IOException {
         // Establecer conexión con el nodo maestro
         Nodo nodoMaestro = maestros.get(0); // Tomamos el primer nodo maestro
-       
+        //ServerSocket socket = new ServerSocket(8082);
         informarMaestro(nodoMaestro);
     }
 
@@ -82,7 +83,7 @@ public class Extremo extends Nodo{
             HttpEntity<MensajeListaArchivos> requestEntity = new HttpEntity<>(mensajeInicial, headers);
 
             // Send the POST request and get the response entity
-            restTemplate.postForEntity("http://"+ nodoMaestro.getDireccionIp() +":"+ nodoMaestro.getPuerto()+"/maestro/iniciar", requestEntity, Void.class);
+            restTemplate.postForEntity("http://"+ nodoMaestro.getDireccionIp() +":"+ nodoMaestro.getPuerto()+"/maestro/informar", requestEntity, Void.class);
 
             // Check the response status code
             // if (responseEntity.getStatusCode() == HttpStatus.OK) {
@@ -99,7 +100,7 @@ public class Extremo extends Nodo{
 
     public Nodo consultar(String archivo) {
 
-        Maestro nodoMaestro = maestros.get(0);
+        Nodo nodoMaestro = maestros.get(0);
 
         try {
             // establish a connection with the Maestro node
