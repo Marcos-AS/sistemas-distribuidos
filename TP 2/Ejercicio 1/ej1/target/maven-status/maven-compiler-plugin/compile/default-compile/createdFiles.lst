@@ -1,0 +1,12 @@
+spring\config\AppConfig.class
+spring\model\Recurso.class
+spring\model\Extremo$1.class
+spring\model\Par.class
+spring\model\Extremo.class
+spring\controller\MasterServerController.class
+spring\model\Consulta.class
+spring\model\Solicitud.class
+spring\model\MensajeListaArchivos.class
+spring\model\Nodo.class
+spring\model\Maestro.class
+spring\App.class
