@@ -37,7 +37,7 @@ public class App
         List<Nodo> maestros = new ArrayList<>();
        // Nodo nodo3 = new Nodo("localhost", 8083);     
         //maestros.add(maestro); 
-        maestros.add(new Nodo("localhost",8080));
+        maestros.add(new Nodo("localhost",8085));
         Extremo extremo1 = new Extremo(maestros, "localhost", 8084, rutaParaExtremo1);
         extremo1.iniciar();
 

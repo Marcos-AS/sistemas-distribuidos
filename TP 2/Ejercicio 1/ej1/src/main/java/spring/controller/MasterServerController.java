@@ -1,7 +1,6 @@
 package spring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import spring.model.Maestro;
@@ -9,9 +8,6 @@ import spring.model.MensajeListaArchivos;
 import spring.model.Nodo;
 import spring.model.Recurso;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 

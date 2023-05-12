@@ -3,13 +3,21 @@ version: '3.1'
 
 services:
 
-  db:
+  master:
     image: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: example
     ports:
       - 3306:3306
+
+  master2:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+    ports:
+      - 3307:3307
 
   adminer:
     image: adminer
@@ -18,11 +26,21 @@ services:
       - 8081:8080
   
   flyway:
-    image: flyway/flyway
-    command: ["-url=jdbc:mariadb://db:3306/maestro", "-user=root", "-password=example", "migrate"]
-    volumes:
-      - ./sql:/flyway/sql
-    depends_on:
-      - db
-    links:
-      - db
+     image: flyway/flyway
+     command: ["-url=jdbc:mariadb://master:3306/maestro", "-user=root", "-password=example", "migrate"]
+     volumes:
+       - ./sql:/flyway/sql
+     depends_on:
+       - master
+     links:
+       - master
+
+  # flyway2:
+  #   image: flyway/flyway
+  #   command: ["-url=jdbc:mariadb://db2:3307/maestro", "-user=root", "-password=example", "migrate"]
+  #   volumes:
+  #     - ./sql:/flyway/sql
+  #   depends_on:
+  #     - db2
+  #   links:
+  #     - db2
