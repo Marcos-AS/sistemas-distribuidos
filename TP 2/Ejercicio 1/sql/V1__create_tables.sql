@@ -1,5 +1,4 @@
-CREATE USER 'repluser'@'%' IDENTIFIED BY 'replsecret';
-GRANT REPLICATION SLAVE ON *.* TO 'repluser'@'%';
+GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY 'example';
 
 create table Extremo (
     direccionIp VARCHAR(20),

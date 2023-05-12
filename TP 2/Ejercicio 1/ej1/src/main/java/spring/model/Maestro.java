@@ -127,7 +127,7 @@ public class Maestro{
 
     public void cargar(@RequestBody MensajeListaArchivos mensaje) {
         try {
-            String sql = "INSERT INTO Extremo (direccionIp, puerto) VALUES (?, ?)";
+            String sql = "INSERT INTO extremo (direccionIp, puerto) VALUES (?, ?)";
             jdbcTemplate.update(sql, mensaje.getNodoExtremo().getDireccionIp(), mensaje.getNodoExtremo().getPuerto());
             System.out.println("INSERT realizado.");
             /*sql = "INSERT INTO archivo (nombre, magicNumber) VALUES (?, ?)";
