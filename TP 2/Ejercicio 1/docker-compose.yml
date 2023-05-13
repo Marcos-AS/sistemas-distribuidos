@@ -11,13 +11,13 @@ services:
     ports:
       - 3306:3306
 
-  master2:
-    image: mariadb
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: example
-    ports:
-      - 3307:3306
+  # master2:
+  # image: mariadb
+  #  restart: always
+  #  environment:
+  #    MARIADB_ROOT_PASSWORD: example
+  #  ports:
+  #    - 3307:3306
 
   adminer:
     image: adminer
@@ -35,12 +35,12 @@ services:
      links:
        - master
 
-  flyway2:
-    image: flyway/flyway
-    command: ["-url=jdbc:mariadb://master2:3307/maestro", "-user=root", "-password=example", "migrate"]
-    volumes:
-      - ./sql:/flyway/sql
-    depends_on:
-      - master2
-    links:
-      - master2
+  #flyway2:
+  #  image: flyway/flyway
+  #  command: ["-url=jdbc:mariadb://master2:3307/maestro", "-user=root", "-password=example", "migrate"]
+  #  volumes:
+  #    - ./sql:/flyway/sql
+  # depends_on:
+  #    - master2
+  #  links:
+  #    - master2
