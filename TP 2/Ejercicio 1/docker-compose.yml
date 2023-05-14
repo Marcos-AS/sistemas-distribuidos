@@ -3,7 +3,7 @@ version: '3.1'
 
 services:
 
-  master:
+  db_archivos:
     image: mariadb
     restart: always
     environment:
@@ -26,14 +26,15 @@ services:
       - 8081:8080
   
   flyway:
-     image: flyway/flyway
-     command: ["-url=jdbc:mariadb://master:3306/maestro", "-user=root", "-password=example", "migrate"]
-     volumes:
+    image: flyway/flyway
+    command: ["-url=jdbc:mariadb://db_archivos:3306/maestro", "-user=root", "-password=example", "migrate"]
+    volumes:
        - ./sql:/flyway/sql
-     depends_on:
-       - master
-     links:
-       - master
+    depends_on:
+       - db_archivos
+    links:
+       - db_archivos
+
 
   #flyway2:
   #  image: flyway/flyway
