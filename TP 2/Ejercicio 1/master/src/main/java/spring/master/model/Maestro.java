@@ -34,7 +34,10 @@ public class Maestro{
 
             // Inserta cada archivo en la BD
             sql = "INSERT INTO Archivo (direccionIp, puerto, nombre) VALUES (?, ?, ?)";
-            jdbcTemplate.update(sql, new BatchPreparedStatementSetter() {
+            for (String nombre : archivos) {
+                jdbcTemplate.update(sql, direccionIp, puerto, nombre);
+            }
+            /*jdbcTemplate.update(sql, new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     String nombre = archivos.get(i);
@@ -46,7 +49,7 @@ public class Maestro{
                 public int getBatchSize() {
                     return archivos.size();
                 }
-            });
+            }); */
             System.out.println("INSERT de archivos realizado.");
             } catch (Exception e) {
                  System.out.println(e);

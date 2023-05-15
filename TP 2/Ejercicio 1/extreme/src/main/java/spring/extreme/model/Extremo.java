@@ -2,9 +2,12 @@ package spring.extreme.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Component
@@ -23,7 +27,9 @@ public class Extremo {
     //para enviar peticiones
     RestTemplate restTemplate = new RestTemplate();
 
-    
+    @Value("${server.port}")
+    private String numPuerto;
+
     // curl -X POST -H "Content-Type: application/json" -d '{"direccionIp":"192.168.1.1", "puerto": 8080}' http://<direccion_ip>:<puerto>
 
     public void informarMaestro(String direccionIp, int puerto) {
@@ -37,8 +43,13 @@ public class Extremo {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            String jsonBody = mapper.writeValueAsString(listaArchivosDisponibles());
 
+            // Crear objeto que contiene la lista de archivos y el número de puerto
+            Map<String, Object> objetoJson = new HashMap<>();
+            objetoJson.put("archivos", listaArchivosDisponibles());
+            objetoJson.put("puerto", numPuerto);
+
+            String jsonBody = mapper.writeValueAsString(objetoJson);
             // Create the request entity with the body and headers
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
@@ -92,6 +103,15 @@ public class Extremo {
             }
         }
         return recursosPropios;
+    }
+
+    public void consultarMaestro(String archivo) throws JsonProcessingException {
+        
+        String direccionIp = "localhost";
+        int puerto = 8084;
+
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consulta?archivo= " + archivo, String.class);
+
     }
     
 }

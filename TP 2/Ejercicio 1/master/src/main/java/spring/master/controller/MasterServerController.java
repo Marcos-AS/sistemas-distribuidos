@@ -7,6 +7,7 @@ import spring.master.model.Maestro;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -18,8 +19,10 @@ public class MasterServerController {
     private Maestro maestro;
         
     @PostMapping("/cargar")
-    public void cargarExtremo(HttpServletRequest request, @RequestBody List<String> archivos) throws SQLException {
-        maestro.cargar(request.getRemoteAddr(), request.getRemotePort(), archivos);
+    public void cargarExtremo(HttpServletRequest request, @RequestBody Map<String,Object> datosExtremo) throws SQLException {
+        String puerto = (String) datosExtremo.get("puerto");
+        List<String> archivos = (List<String>) datosExtremo.get("archivos");
+        maestro.cargar(request.getRemoteAddr(), Integer.parseInt(puerto), archivos);
     }
     
 }

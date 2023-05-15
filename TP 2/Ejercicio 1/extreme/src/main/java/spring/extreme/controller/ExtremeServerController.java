@@ -3,6 +3,8 @@ package spring.extreme.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import spring.extreme.model.Extremo;
 import spring.extreme.model.MaestroRequest;
 
@@ -17,6 +19,13 @@ public class ExtremeServerController {
     public void informar(@RequestBody MaestroRequest maestroRequest) {
         extremo.informarMaestro(maestroRequest.getDireccionIp(), maestroRequest.getPuerto());
     }
+
+    @GetMapping("/consultar")
+    public void consultar(@RequestBody String archivo) throws JsonProcessingException {
+        extremo.consultarMaestro(archivo);
+    }
+
+
 
     
 
