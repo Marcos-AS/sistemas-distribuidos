@@ -110,7 +110,7 @@ public class Extremo {
         String direccionIp = "localhost";
         int puerto = 8084;
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consulta?archivo= " + archivo, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consultar?archivo= " + archivo, String.class);
 
     }
     

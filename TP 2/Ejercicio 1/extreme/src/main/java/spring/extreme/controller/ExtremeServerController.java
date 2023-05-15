@@ -20,8 +20,8 @@ public class ExtremeServerController {
         extremo.informarMaestro(maestroRequest.getDireccionIp(), maestroRequest.getPuerto());
     }
 
-    @GetMapping("/consultar")
-    public void consultar(@RequestBody String archivo) throws JsonProcessingException {
+    @GetMapping("/descargar")
+    public void consultar(@RequestParam("archivo") String archivo) throws JsonProcessingException {
         extremo.consultarMaestro(archivo);
     }
 

@@ -54,6 +54,18 @@ public class Maestro{
             } catch (Exception e) {
                  System.out.println(e);
             }   
-        } 
+        }
+
+    public String buscar(String archivo) {
+        
+        String sql = "SELECT direccionIp, puerto FROM Archivo WHERE nombre = ?";
+        Object[] params = {archivo};
+
+        Map<String, Object> resultado = jdbcTemplate.queryForMap(sql, params);
+
+        String direccionIp = (String) resultado.get("direccionIp");
+        int puerto = (int) resultado.get("puerto");
+        return direccionIp + ":" + puerto;
+    } 
     }
 

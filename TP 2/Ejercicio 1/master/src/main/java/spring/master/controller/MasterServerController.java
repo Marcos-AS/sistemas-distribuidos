@@ -24,5 +24,10 @@ public class MasterServerController {
         List<String> archivos = (List<String>) datosExtremo.get("archivos");
         maestro.cargar(request.getRemoteAddr(), Integer.parseInt(puerto), archivos);
     }
+
+    @GetMapping("/consultar")
+    public String buscarArchivo(@RequestParam("archivo") String archivo) {
+        return maestro.buscar(archivo);
+    }
     
 }
