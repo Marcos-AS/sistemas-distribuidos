@@ -21,8 +21,19 @@ public class ExtremeServerController {
     }
 
     @GetMapping("/descargar")
-    public void consultar(@RequestParam("archivo") String archivo) throws JsonProcessingException {
-        extremo.consultarMaestro(archivo);
+    public void descargar(@RequestParam("archivo") String archivo) {
+        System.out.println("Archivo recibido: " + archivo);
+        try {
+            extremo.consultarMaestro(archivo);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/get")
+    public void enviarArchivo(@RequestParam("archivo") String archivo) {
+        
     }
 
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -61,10 +62,16 @@ public class Maestro{
         String sql = "SELECT direccionIp, puerto FROM Archivo WHERE nombre = ?";
         Object[] params = {archivo};
 
-        Map<String, Object> resultado = jdbcTemplate.queryForMap(sql, params);
+        List<Map<String, Object>> resultados = jdbcTemplate.queryForList(sql, params);
 
+        if (resultados.isEmpty()) {
+            throw new NoSuchElementException("No se encontró ningún resultado para el archivo: " + archivo);
+        }
+
+        Map<String, Object> resultado = resultados.get(0);
         String direccionIp = (String) resultado.get("direccionIp");
         int puerto = (int) resultado.get("puerto");
+        
         return direccionIp + ":" + puerto;
     } 
     }

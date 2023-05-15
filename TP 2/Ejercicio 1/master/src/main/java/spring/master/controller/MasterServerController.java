@@ -27,6 +27,7 @@ public class MasterServerController {
 
     @GetMapping("/consultar")
     public String buscarArchivo(@RequestParam("archivo") String archivo) {
+        System.out.println("Archivo recibido: " + archivo);
         return maestro.buscar(archivo);
     }
     

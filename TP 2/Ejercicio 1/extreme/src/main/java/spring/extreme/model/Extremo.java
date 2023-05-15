@@ -110,7 +110,13 @@ public class Extremo {
         String direccionIp = "localhost";
         int puerto = 8084;
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consultar?archivo= " + archivo, String.class);
+        // Consulta al maestro sobre el archivo recibido para saber con que extremo debe comunicarse
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consultar?archivo=" + archivo, String.class);
+        System.out.println(responseEntity);
+        
+        String direccionExtremo = responseEntity.getBody();
+
+        ResponseEntity<String> responseEntityExtreme = restTemplate.getForEntity("http://"+ direccionExtremo +"/extremo/get?archivo=" + archivo, String.class);
 
     }
     
