@@ -10,6 +10,8 @@ services:
       MARIADB_ROOT_PASSWORD: example
     ports:
       - 3306:3306
+    networks:
+      - mi-red
 
   # master2:
   # image: mariadb
@@ -24,6 +26,8 @@ services:
     restart: always
     ports:
       - 8081:8080
+    networks:
+      - mi-red
   
   flyway:
     image: flyway/flyway
@@ -34,7 +38,12 @@ services:
        - db_archivos
     links:
        - db_archivos
+    networks:
+      - mi-red
 
+networks:
+  mi-red:
+    external: true
 
   #flyway2:
   #  image: flyway/flyway

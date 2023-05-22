@@ -1,4 +1,4 @@
-package spring.extreme.model;
+package spring.extreme.services;
 
 public class MaestroRequest {
     private String direccionIp;

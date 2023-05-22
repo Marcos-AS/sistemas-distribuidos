@@ -1,24 +1,31 @@
-package spring.extreme.model;
+package spring.extreme.services;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Component
@@ -53,6 +60,10 @@ public class Extremo {
             // Create the request entity with the body and headers
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 
+            RestTemplate restTemplate = new RestTemplate();
+            System.out.println(direccionIp);
+            System.out.println(puerto);
+            System.out.println(requestEntity);
             // Send the POST request and get the response entity
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/cargar", requestEntity, Void.class);
 
@@ -65,36 +76,8 @@ public class Extremo {
         }
     }
 
-    /*public Nodo consultar(String archivo) {
-
-        Nodo nodoMaestro = maestros.get(0);
-
-        try {
-            // establish a connection with the Maestro node
-            Socket socketMaestro = new Socket(nodoMaestro.getDireccionIp(), nodoMaestro.getPuerto());
-
-            ObjectOutputStream outputStream = new ObjectOutputStream(socketMaestro.getOutputStream());
-            ObjectInputStream inputStream = new ObjectInputStream(socketMaestro.getInputStream());
-
-            outputStream.writeObject(new Consulta(archivo));
-
-            Object respuesta = inputStream.readObject();
-
-            // Close the connection
-            outputStream.close();
-            socketMaestro.close();
-
-            return (Nodo) respuesta;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    } */
-
     public List<String> listaArchivosDisponibles() {
-        File carpetaArchivos = new File("C:\\Users\\leo_2\\OneDrive\\Documentos\\GitHub\\sistemas-distribuidos\\TP 2\\Ejercicio 1\\extreme\\archivos");
+        File carpetaArchivos = new File("/app/archivos");
         File[] archivos = carpetaArchivos.listFiles();
         List<String> recursosPropios = new ArrayList<>();
         for (File archivo : archivos) {
@@ -105,19 +88,64 @@ public class Extremo {
         return recursosPropios;
     }
 
-    public void consultarMaestro(String archivo) throws JsonProcessingException {
+    public void consultarMaestro(String archivo) throws IOException {
         
-        String direccionIp = "localhost";
-        int puerto = 8084;
+        System.out.println("Archivo recibido: " + archivo);
+
+        String direccionIp = "maestro";
+        int puerto = 8085;
+
+        RestTemplate restTemplate = new RestTemplate();
 
         // Consulta al maestro sobre el archivo recibido para saber con que extremo debe comunicarse
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/consultar?archivo=" + archivo, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+direccionIp+":"+puerto+"/maestro/consultar?archivo=" + archivo, String.class);
         System.out.println(responseEntity);
         
         String direccionExtremo = responseEntity.getBody();
 
-        ResponseEntity<String> responseEntityExtreme = restTemplate.getForEntity("http://"+ direccionExtremo +"/extremo/get?archivo=" + archivo, String.class);
+        System.out.println(direccionExtremo);
 
+        RestTemplate restTemplate2 = new RestTemplate();   
+
+        ResponseEntity<byte[]> responseEntityExtreme = restTemplate2.getForEntity("http://"+direccionExtremo+"/extremo/get?archivo=" + archivo, byte[].class);
+
+        // Verificar el código de respuesta
+        HttpStatusCode statuscode = responseEntityExtreme.getStatusCode();
+        if (statuscode.value() == 200) {
+
+            // Guardar el archivo descargado como un objeto MultipartFile
+            MultipartFile file = new MockMultipartFile("file", responseEntityExtreme.getBody());
+            Path filepath = Paths.get("/app/archivos", archivo);
+
+            Files.write(filepath, file.getBytes());
+
+            System.out.println("Archivo descargado correctamente");
+
+            //Ahora vamos a notificar al maestro que tengo mi archivo
+
+            informarMaestro(direccionIp, puerto);
+
+        } else
+            System.out.println("Error al descargar el archivo. Código de respuesta: " + statuscode);
     }
-    
+
+    public ResponseEntity<Resource> enviarArchivo(String archivo) {
+        // Obtener el archivo del servidor a partir del nombre
+        File file = new File("/app/archivos/" + archivo);
+
+        // Verificar si el archivo existe
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Crear un recurso de Spring para el archivo
+        Resource recurso = new FileSystemResource(file);
+
+        System.out.println("Enviando archivo.. :" + recurso.getFilename());
+        // Crear una respuesta HTTP con el archivo adjunto
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .body(recurso);
+    }
 }

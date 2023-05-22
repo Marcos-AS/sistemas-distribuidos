@@ -3,13 +3,12 @@ package spring.master.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import spring.master.model.Maestro;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
+import spring.master.services.Maestro;
 
 @RestController
 @RequestMapping("/maestro")

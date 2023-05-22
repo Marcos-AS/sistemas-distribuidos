@@ -1,4 +1,5 @@
-spring\extreme\model\MaestroRequest.class
-spring\extreme\model\Extremo.class
+spring\extreme\config\WebConfig.class
+spring\extreme\services\Extremo.class
+spring\extreme\services\MaestroRequest.class
 spring\extreme\controller\ExtremeServerController.class
 spring\extreme\ExtremeApplication.class
