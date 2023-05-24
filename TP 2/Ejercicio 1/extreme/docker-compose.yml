@@ -1,7 +1,7 @@
 version: '3'
 services:
   extremo:
-    image: extremo:latest
+    build: .
     ports:
       - 5001:8080
     volumes:
@@ -11,7 +11,7 @@ services:
 
 
   extremo2:
-    image: extremo:latest
+    build: .
     ports:
       - 5002:8080
     volumes:
