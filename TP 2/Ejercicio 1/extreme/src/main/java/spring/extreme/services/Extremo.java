@@ -28,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import jakarta.ws.rs.core.Response;
+
 @Component
 public class Extremo {
 
@@ -39,7 +41,7 @@ public class Extremo {
 
     // curl -X POST -H "Content-Type: application/json" -d '{"direccionIp":"192.168.1.1", "puerto": 8080}' http://<direccion_ip>:<puerto>
 
-    public void informarMaestro(String direccionIp, int puerto) {
+    public ResponseEntity<String> informarMaestro(String direccionIp, int puerto) {
         
         try {
             // Set the request headers
@@ -68,12 +70,15 @@ public class Extremo {
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity("http://"+ direccionIp +":"+ puerto +"/maestro/cargar", requestEntity, Void.class);
 
             // Check the response status code
-             if (responseEntity.getStatusCode() == HttpStatus.OK)
-                 System.out.println("POST request sent successfully");
-
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                System.out.println("POST request sent successfully");
+                return ResponseEntity.ok("Informacion enviada correctamente al maestro.");
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar la información al maestro."); 
         }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar la información al maestro.");
     }
 
     public List<String> listaArchivosDisponibles() {
@@ -88,7 +93,7 @@ public class Extremo {
         return recursosPropios;
     }
 
-    public void consultarMaestro(String archivo) throws IOException {
+    public ResponseEntity<String> consultarMaestro(String archivo) throws IOException {
         
         System.out.println("Archivo recibido: " + archivo);
 
@@ -99,6 +104,7 @@ public class Extremo {
 
         // Consulta al maestro sobre el archivo recibido para saber con que extremo debe comunicarse
         ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://"+direccionIp+":"+puerto+"/maestro/consultar?archivo=" + archivo, String.class);
+        //ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://2ad2-2800-2165-d000-10b-585f-dbab-9954-9723.sa.ngrok.io/maestro/consultar?archivo=" + archivo, String.class);
         System.out.println(responseEntity);
         
         String direccionExtremo = responseEntity.getBody();
@@ -125,8 +131,12 @@ public class Extremo {
 
             informarMaestro(direccionIp, puerto);
 
-        } else
+            return ResponseEntity.ok("Se descargo el archivo " + archivo + " correctamente en el extremo.");
+
+        } else {
             System.out.println("Error al descargar el archivo. Código de respuesta: " + statuscode);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al descargar el archivo.");
+        }
     }
 
     public ResponseEntity<Resource> enviarArchivo(String archivo) {

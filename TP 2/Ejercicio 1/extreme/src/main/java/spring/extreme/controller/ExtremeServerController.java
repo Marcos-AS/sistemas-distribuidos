@@ -19,13 +19,13 @@ public class ExtremeServerController {
     private Extremo extremo;
     
     @PostMapping("/informar")
-    public void informar(@RequestBody MaestroRequest maestroRequest) {
-        extremo.informarMaestro(maestroRequest.getDireccionIp(), maestroRequest.getPuerto());
+    public ResponseEntity<String> informar(@RequestBody MaestroRequest maestroRequest) {
+        return extremo.informarMaestro(maestroRequest.getDireccionIp(), maestroRequest.getPuerto());
     }
 
     @GetMapping("/descargar")
-    public void descargar(@RequestParam("archivo") String archivo) throws IOException {
-        extremo.consultarMaestro(archivo);
+    public ResponseEntity<String> descargar(@RequestParam("archivo") String archivo) throws IOException {
+        return extremo.consultarMaestro(archivo);
     }
 
     @GetMapping("/get")

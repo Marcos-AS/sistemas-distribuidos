@@ -60,12 +60,12 @@ public class Maestro{
                     int archivoExistente = jdbcTemplate.queryForObject(archivoExistenteQuery, Integer.class, direccionIp, puerto, nombre);
                     if (archivoExistente == 0) {
                         jdbcTemplate.update(insertArchivoQuery, direccionIp, puerto, nombre);
+                        System.out.println("INSERT del archivo " + nombre + "realizado.");
                     }
                 } catch (Exception e) {
                     System.out.println(e);
                 }
             }
-            System.out.println("INSERT de archivos realizado.");
         }
         }
         

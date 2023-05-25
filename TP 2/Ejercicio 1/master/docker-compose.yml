@@ -1,7 +1,7 @@
 version: '3'
 services:
   maestro:
-    build: .
+    image: maestro:latest
     ports:
       - 8085:8080
     networks:
