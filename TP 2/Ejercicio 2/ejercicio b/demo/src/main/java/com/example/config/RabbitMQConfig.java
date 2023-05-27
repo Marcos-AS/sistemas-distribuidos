@@ -26,5 +26,4 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(imageQueue()).to(imageExchange()).with(routingKey);
     }
 
-
 }
