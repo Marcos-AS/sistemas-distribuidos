@@ -13,6 +13,7 @@ import com.example.ImagePiece;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,8 @@ public class ImageController {
     }
 
     @PostMapping("/divide-image")
-    public int divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) {
-        List<ImagePiece> imagePieces = new ArrayList<>();
+    public void divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) {
+        //List<ImagePiece> imagePieces = new ArrayList<>();
 
         try {
             BufferedImage image = ImageIO.read(file.getInputStream());
@@ -52,8 +53,8 @@ public class ImageController {
                 }
 
                 BufferedImage piece = image.getSubimage(x, 0, pieceWidth, pieceHeight);
-                ImagePiece imagePiece = new ImagePiece(i, piece);
-                imagePieces.add(imagePiece);
+                //ImagePiece imagePiece = new ImagePiece(i, piece);
+                //imagePieces.add(imagePiece);
 
                 // Convertir la imagen a un array de bytes
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -68,11 +69,19 @@ public class ImageController {
 
                 // Convertir el objeto JSON a bytes
                 byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
+                int jsonLength = jsonBytes.length;
 
+                ByteBuffer buffer = ByteBuffer.allocate(4 + jsonLength + imageData.length);
+                buffer.putInt(jsonLength);
+                buffer.put(jsonBytes);
+                buffer.put(imageData);
+
+                byte[] combinedMessage = buffer.array();
+                System.out.println(combinedMessage.length);
                 // Crear un arreglo de bytes para el mensaje combinado
-                byte[] combinedMessage = new byte[imageData.length + jsonBytes.length];
-                System.arraycopy(jsonBytes, 0, combinedMessage, 0, jsonBytes.length);
-                System.arraycopy(imageData, 0, combinedMessage, jsonBytes.length, imageData.length);
+                //byte[] combinedMessage = new byte[imageData.length + jsonBytes.length];
+                //System.arraycopy(jsonBytes, 0, combinedMessage, 0, jsonBytes.length);
+                //System.arraycopy(imageData, 0, combinedMessage, jsonBytes.length, imageData.length);
 
                 // Enviar el mensaje combinado a la cola de RabbitMQ
                 rabbitTemplate.convertAndSend("image-queue", combinedMessage);
@@ -83,6 +92,6 @@ public class ImageController {
             e.printStackTrace();
         }
 
-        return imagePieces.size();
+        //return imagePieces.size();
     }
 }
