@@ -1,0 +1,4 @@
+spring\App.class
+spring\ImageMessage.class
+spring\ImageProcessor.class
+spring\config\RabbitMQConfig.class
