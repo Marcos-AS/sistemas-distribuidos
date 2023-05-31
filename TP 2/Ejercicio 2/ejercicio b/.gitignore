@@ -2,3 +2,4 @@ rabbitmq/data/
 target/
 .vscode/
 *.jar
+/src/main/resources/able-tide-388304-ee07778c2484.json

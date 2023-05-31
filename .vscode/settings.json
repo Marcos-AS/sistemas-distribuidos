@@ -1,5 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.home": "C:\\Program Files\\Java\\jdk-11"
+    "java.home": "C:\\Program Files\\Java\\jdk-11",
+    "zowe.settings.version": 2
 }
