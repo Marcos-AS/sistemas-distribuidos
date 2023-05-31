@@ -1,0 +1,10 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672   # Puerto para la comunicación AMQP
+      - 15672:15672 # Puerto para el panel de administración de RabbitMQ
+    volumes:
+      - ./data:/var/lib/rabbitmq # Montar un volumen para persistir los datos
+

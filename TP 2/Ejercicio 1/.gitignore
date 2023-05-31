@@ -1,3 +1,4 @@
 /log-files-primary
 /.vscode
 *.log
+bin/
