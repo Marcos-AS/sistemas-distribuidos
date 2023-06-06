@@ -3,6 +3,7 @@ package com.example.controllers;
 import org.json.JSONObject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,8 +37,10 @@ import javax.imageio.ImageIO;
 public class ImageController {
 
     private final RabbitTemplate rabbitTemplate;
+    private final String BUCKET_NAME = "bucket-imagenes-ej2b";
 
-
+    @Value("${projectid}")
+    private String projectId;
 
     @Autowired
     public ImageController(RabbitTemplate rabbitTemplate) {
@@ -48,13 +51,12 @@ public class ImageController {
 
         // Ruta del archivo JSON de las credenciales
         String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\src\\main\\resources\\able-tide-388304-ee07778c2484.json";
-    
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
     
                 // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
                 StorageOptions storageOptions = StorageOptions.newBuilder()
                 .setCredentials(credentials)
-                .setProjectId("able-tide-388304")
+                .setProjectId(projectId)
                 .build();
     
         // Obtiene una instancia de Storage desde StorageOptions
@@ -68,7 +70,7 @@ public class ImageController {
     public void divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) throws FileNotFoundException, IOException {
         //List<ImagePiece> imagePieces = new ArrayList<>();
 
-        String bucketName = "bucket-imagenes-ej2b";
+        String bucketName = BUCKET_NAME;
         Storage storage = inicializarCloud();
 
         try {

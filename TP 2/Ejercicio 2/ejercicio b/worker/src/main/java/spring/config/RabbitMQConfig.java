@@ -17,7 +17,7 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     } */
 
-    private static final String queueName = "result-queue";
+    private static final String QUEUE_NAME = "result-queue";
     private static final String exchangeName = "my-image-exchange";
     private static final String routingKey = "image-routing-key";
 
@@ -35,7 +35,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue imageQueue() {
-        return new Queue(queueName, true);
+        return new Queue(QUEUE_NAME, true);
     }
 
     @Bean
