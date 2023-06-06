@@ -86,7 +86,7 @@ jobs:
           context: TP 2/Ejercicio 2/ejercicio b
           file: TP 2/Ejercicio 2/ejercicio b/demo/Dockerfile
           push: true
-          tags: marcos1as/sobelDemo:latest
+          tags: marcos1as/sobeldemo:latest
       
       - name: Run docker image
         working-directory: TP 2/Ejercicio 2/ejercicio b
