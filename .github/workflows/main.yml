@@ -57,12 +57,6 @@ jobs:
       #   working-directory: sd/main_concepts/09_nodejs_pipeline
       #   run: |
       #     npm outdated
-
-      - name: Run npm check dependencies
-        working-directory: TP 2/Ejercicio 2/ejercicio b
-        run: |
-          #dependency-check ./package.json --verbose
-          bash ./scripts/depcheck.sh
     
   build:
     needs: [setup-stage, dependencies] 
