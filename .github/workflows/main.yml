@@ -47,7 +47,7 @@ jobs:
         run: |
 
           ls -lah
-          bucket_name="unlu-tf-state"
+          bucket_name="bucket-imagenes-ej2b"
           prefix="gke/state"
           
           terraform init --reconfigure \
