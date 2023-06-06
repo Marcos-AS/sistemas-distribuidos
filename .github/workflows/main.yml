@@ -1,4 +1,4 @@
-name: First Node Pipeline 
+name: Spring Pipeline 
 
 on:
   push:
@@ -48,23 +48,17 @@ jobs:
         run: |
           ls -lah
           
-      - name: Run npm install commands
+      - name: Run maven install commands
         working-directory: TP 2/Ejercicio 2/ejercicio b
         run: |
-          npm install
-          npm install dependency-check -g
-
+          sudo apt-get install maven
+        
       # - name: Run npm outdated
       #   working-directory: sd/main_concepts/09_nodejs_pipeline
       #   run: |
       #     npm outdated
 
-      - name: Run npm check dependencies
-        working-directory: TP 2/Ejercicio 2/ejercicio b
-        run: |
-          #dependency-check ./package.json --verbose
-          bash ./scripts/depcheck.sh
-    
+          
   build:
     needs: [setup-stage, dependencies] 
     
