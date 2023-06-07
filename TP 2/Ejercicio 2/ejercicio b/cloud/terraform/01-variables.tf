@@ -10,10 +10,10 @@ variable "zone" {
 
 variable "credentials_file_path" {
   description = "Path to GCP service account credentials file"
-  default     = "/../demo/src/main/resources/terraform.json"
+  default     = "/demo/src/main/resources/terraform.json"
 }
 
 variable "project_id" {
   type    = string
-  default = "sd-2023-384422"
+  default = "able-tide-388304"
 }
