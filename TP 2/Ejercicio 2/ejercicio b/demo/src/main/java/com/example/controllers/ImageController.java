@@ -50,7 +50,7 @@ public class ImageController {
     public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
         // Ruta del archivo JSON de las credenciales
-        String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\src\\main\\resources\\able-tide-388304-ee07778c2484.json";
+        String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\cloud\\terraform\\terraform.json";
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
     
                 // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
@@ -83,16 +83,16 @@ public class ImageController {
 
             
             int x = 0;
+            String idTarea = UUID.randomUUID().toString();
             for (int i = 0; i < numPieces; i++) {
                 String id = UUID.randomUUID().toString();
-                int pieceHeight = height;
+
                 if (i == numPieces - 1) {
                     pieceWidth += remainingWidth;
                 }
 
-                BufferedImage piece = image.getSubimage(x, 0, pieceWidth, pieceHeight);
-                //ImagePiece imagePiece = new ImagePiece(i, piece);
-                //imagePieces.add(imagePiece);
+                //crea pedazo de la imagen
+                BufferedImage piece = image.getSubimage(x, 0, pieceWidth, height);
 
                 // Convertir la imagen a un array de bytes
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -101,21 +101,21 @@ public class ImageController {
 
                 // Crear el objeto JSON
                 JSONObject json = new JSONObject();
-                json.put("messageId", id);
+                json.put("messageId", idTarea);
                 json.put("pieces", numPieces);
-                json.put("imageName", file.getOriginalFilename());
+                json.put("imageName", id);
 
                 // Convertir el objeto JSON a bytes
                 byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
-                int jsonLength = jsonBytes.length;
+                // int jsonLength = jsonBytes.length;
 
-                ByteBuffer buffer = ByteBuffer.allocate(4 + jsonLength + imageData.length);
-                buffer.putInt(jsonLength);
-                buffer.put(jsonBytes);
-                buffer.put(imageData);
+                // ByteBuffer buffer = ByteBuffer.allocate(4 + jsonLength);
+                // buffer.putInt(jsonLength);
+                // buffer.put(jsonBytes);
+                // buffer.put(imageData);
 
-                byte[] combinedMessage = buffer.array();
-                System.out.println(combinedMessage.length);
+                // byte[] combinedMessage = buffer.array();
+                // System.out.println(combinedMessage.length);
 
                 // Sube un archivo al bucket
                 String nombreArchivoRemoto = id;
@@ -124,19 +124,8 @@ public class ImageController {
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
                 storage.create(blobInfo, imageData);
 
-                //Blob blob = bucket.create(nombreArchivoRemoto, new FileInputStream(imageData));
-
-                // Imprime la URL pública del archivo
-                // String url = blob.getMediaLink();
-                // System.out.println("URL del archivo: " + url);
-
-                // Crear un arreglo de bytes para el mensaje combinado
-                //byte[] combinedMessage = new byte[imageData.length + jsonBytes.length];
-                //System.arraycopy(jsonBytes, 0, combinedMessage, 0, jsonBytes.length);
-                //System.arraycopy(imageData, 0, combinedMessage, jsonBytes.length, imageData.length);
-
                 // Enviar el mensaje combinado a la cola de RabbitMQ
-                //rabbitTemplate.convertAndSend("image-queue", combinedMessage);
+                rabbitTemplate.convertAndSend("image-queue", jsonBytes);
 
                 x += pieceWidth;
             }
