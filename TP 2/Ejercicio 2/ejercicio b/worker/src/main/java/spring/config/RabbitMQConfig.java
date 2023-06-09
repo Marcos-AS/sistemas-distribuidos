@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,6 +33,11 @@ public class RabbitMQConfig {
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
     }
+    
+    // @Bean
+    // public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    //     return new RabbitTemplate(connectionFactory);
+    // }
 
     @Bean
     public Queue imageQueue() {
