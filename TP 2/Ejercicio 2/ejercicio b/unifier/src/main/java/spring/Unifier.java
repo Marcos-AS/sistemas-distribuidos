@@ -32,6 +32,7 @@ import jakarta.annotation.Resource;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.storage.Blob.BlobSourceOption;
@@ -87,6 +88,7 @@ public class Unifier {
       String idTarea = json.getString("messageId");
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
+      String originalName = json.getString("originalName");
 
       System.out.println("Received message: " + json);
       System.out.println("Message ID: " + idTarea);
@@ -108,6 +110,7 @@ public class Unifier {
       
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
+      //storage.delete(BUCKET_NAME, imageName);
 
       ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
       BufferedImage image = ImageIO.read(bais);
@@ -127,7 +130,7 @@ public class Unifier {
         BufferedImage unifiedImage = unifyImage(dividedImages.get(idTarea), numPieces);
 
         // Guardar la imagen unificada
-        saveUnifiedImage(unifiedImage, imageName);
+        saveUnifiedImage(unifiedImage, originalName);
 
         // Limpiar los datos de la imagen dividida
         dividedImages.remove(idTarea);
@@ -168,19 +171,27 @@ public class Unifier {
     }
   }
 
-    private void saveUnifiedImage(BufferedImage image, String imageName) {
+  //guarda en el bucket con el nombre original de la imagen que envió el usuario
+  private void saveUnifiedImage(BufferedImage image, String imageName) {
       try {
-        String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\";
-        String baseImageName = "image";
-        String uniqueId = UUID.randomUUID().toString();
-        String imagen = baseImageName + "_" + uniqueId  + ".jpg";
-        String outputImagePath = outputDirectory + File.separator + imagen;
+        Storage storage = inicializarCloud();
+        BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", baos);
+        byte[] imageData = baos.toByteArray();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        storage.create(blobInfo, imageData);
+
+        // String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\";
+        // String imagen = baseImageName + "_" + uniqueId  + ".jpg";
+        // String outputImagePath = outputDirectory + File.separator + imagen;
   
-        File imagenFile = new File(outputImagePath);
-        ImageIO.write(image, "jpg", imagenFile);
-        System.out.println("Imagen guardada correctamente en: " + imagenFile.getAbsolutePath());
+        // File imagenFile = new File(outputImagePath);
+        // ImageIO.write(image, "jpg", imagenFile);
+        // System.out.println("Imagen guardada correctamente en: " + imagenFile.getAbsolutePath());
       } catch (Exception e) {
           e.printStackTrace();
       }
     }
+  
   }

@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,17 +13,24 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.ImagePiece;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -104,6 +112,7 @@ public class ImageController {
                 json.put("messageId", idTarea);
                 json.put("pieces", numPieces);
                 json.put("imageName", id);
+                json.put("originalName",file.getOriginalFilename());
 
                 // Convertir el objeto JSON a bytes
                 byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
@@ -118,7 +127,7 @@ public class ImageController {
                 // System.out.println(combinedMessage.length);
 
                 // Sube un archivo al bucket
-                String nombreArchivoRemoto = id;
+                String nombreArchivoRemoto = id; //pone como blobId al id que es nombre de la imagen
                 System.out.println(id);
                 BlobId blobId = BlobId.of(bucketName, nombreArchivoRemoto);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
@@ -136,5 +145,25 @@ public class ImageController {
         //return imagePieces.size();
     }
 
+    @GetMapping("/unified-image")
+    public void unifiedImage(@RequestParam("nombreImagen") String imageName, HttpServletResponse response) {
+        try {
+            Storage storage = inicializarCloud();
+            BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
+            Blob blob = storage.get(blobId);
+            ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
+            BufferedImage image = ImageIO.read(bais);
+
+            // Envías la imagen como respuesta al cliente
+            response.setContentType("image/jpeg");
+            OutputStream out = response.getOutputStream();
+            ImageIO.write(image, "jpeg", out);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    };
     
 }

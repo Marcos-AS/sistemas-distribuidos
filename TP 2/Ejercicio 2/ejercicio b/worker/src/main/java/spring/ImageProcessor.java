@@ -74,6 +74,7 @@ public class ImageProcessor {
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
 
+      //obtiene la imagen desde el bucket
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
 
@@ -98,13 +99,11 @@ public class ImageProcessor {
       storage.create(blobInfo, imageData);
 
 
-      String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\worker\\";
-      String baseImageName = "image";
-      String uniqueId = UUID.randomUUID().toString();
-      String imagen = baseImageName + "_" + uniqueId  + ".jpg";
-      String outputImagePath = outputDirectory + File.separator + imagen;
-
-
+      // String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\worker\\";
+      // String baseImageName = "image";
+      // String uniqueId = UUID.randomUUID().toString();
+      // String imagen = baseImageName + "_" + uniqueId  + ".jpg";
+      // String outputImagePath = outputDirectory + File.separator + imagen;
 
       //File imagenFile = new File(outputImagePath);
       //ImageIO.write(sobelImage, "jpg", imagenFile);
