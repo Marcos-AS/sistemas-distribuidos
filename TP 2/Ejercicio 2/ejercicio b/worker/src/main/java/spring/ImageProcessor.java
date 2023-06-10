@@ -77,8 +77,8 @@ public class ImageProcessor {
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
 
-      System.out.println(blob.getBucket());
-      System.out.println("content: " + blob.getContent(BlobSourceOption.generationMatch()));
+      // System.out.println(blob.getBucket());
+      // System.out.println("content: " + blob.getContent(BlobSourceOption.generationMatch()));
 
       //convierte a bytes la imagen del bucket para aplicarle el filtro que espera bufferedImage
       ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
@@ -86,7 +86,7 @@ public class ImageProcessor {
       BufferedImage grayImage = convertToGrayscale(image);
       BufferedImage sobelImage = applySobelOperator(grayImage);
 
-      System.out.println("llegué hasta despues del delete");
+      // System.out.println("llegué hasta despues del delete");
 
       storage.delete(BUCKET_NAME, imageName);
 

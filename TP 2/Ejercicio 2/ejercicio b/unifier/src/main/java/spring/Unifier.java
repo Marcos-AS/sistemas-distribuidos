@@ -12,7 +12,11 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
@@ -20,38 +24,72 @@ import org.json.JSONObject;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
+
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.Blob.BlobSourceOption;
 
 @Component
 public class Unifier {
   @Resource
   private MessageConverter messageConverter;
   
+  @Value("${projectid}")
+  private String projectId;
+
+  private final String BUCKET_NAME = "bucket-imagenes-ej2b";
+
   private Map<String, List<byte[]>> dividedImages = new HashMap<>();
 
+    public Storage inicializarCloud() throws FileNotFoundException, IOException {
+
+    // Ruta del archivo JSON de las credenciales
+    String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\cloud\\terraform\\terraform.json";
+    GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
+
+    // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
+    StorageOptions storageOptions = StorageOptions.newBuilder()
+    .setCredentials(credentials)
+    .setProjectId(projectId)
+    .build();
+
+    // Obtiene una instancia de Storage desde StorageOptions
+    Storage storage = storageOptions.getService();
+
+    return storage;
+
+    }
+
   @RabbitListener(queues = {"result-queue"})
-  public void processCombinedMessage(Message rabbitMessage) {
+  public void processMessage(Message rabbitMessage) {
     try {
-      byte[] combinedMessage = (byte[])this.messageConverter.fromMessage(rabbitMessage);
-      ByteBuffer buffer = ByteBuffer.wrap(combinedMessage);
-      int jsonLength = buffer.getInt();
-      System.out.println("jsonLength: " + jsonLength);
+      Storage storage = inicializarCloud();
 
-      byte[] jsonBytes = new byte[jsonLength];
-      byte[] imageBytes = new byte[combinedMessage.length - 4 - jsonLength];
-      buffer.get(jsonBytes);
-      buffer.get(imageBytes);
+      byte[] mensaje = (byte[])this.messageConverter.fromMessage(rabbitMessage);
+      // ByteBuffer buffer = ByteBuffer.wrap(combinedMessage);
+      // int jsonLength = buffer.getInt();
+      // System.out.println("jsonLength: " + jsonLength);
 
-      String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+      // byte[] jsonBytes = new byte[jsonLength];
+      // byte[] imageBytes = new byte[combinedMessage.length - 4 - jsonLength];
+      // buffer.get(jsonBytes);
+      // buffer.get(imageBytes);
+
+      String jsonString = new String(mensaje, StandardCharsets.UTF_8);
       JSONObject json = new JSONObject(jsonString);
-      String messageId = json.getString("messageId");
+      String idTarea = json.getString("messageId");
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
 
       System.out.println("Received message: " + json);
-      System.out.println("Message ID: " + messageId);
+      System.out.println("Message ID: " + idTarea);
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
 
@@ -68,22 +106,31 @@ public class Unifier {
       ImageIO.write(image, "jpg", imagenFile);
       System.out.println("Imagen guardada correctamente en: " + imagenFile.getAbsolutePath()); */
       
+      BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
+      Blob blob = storage.get(blobId);
+
+      ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
+      BufferedImage image = ImageIO.read(bais);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ImageIO.write(image, "jpg", baos);
+      byte[] imageData = baos.toByteArray();
+
       // Almacenar el pedazo de imagen recibido
-      if (!dividedImages.containsKey(messageId)) {
-        dividedImages.put(messageId, new ArrayList<>());
+      if (!dividedImages.containsKey(idTarea)) {
+        dividedImages.put(idTarea, new ArrayList<>());
       }
-      dividedImages.get(messageId).add(imageBytes);
+      dividedImages.get(idTarea).add(imageData);
 
       // Verificar si se han recibido todos los pedazos
-      if (dividedImages.get(messageId).size() == numPieces) {
+      if (dividedImages.get(idTarea).size() == numPieces) {
         // Unificar la imagen
-        BufferedImage unifiedImage = unifyImage(dividedImages.get(messageId), numPieces);
+        BufferedImage unifiedImage = unifyImage(dividedImages.get(idTarea), numPieces);
 
         // Guardar la imagen unificada
         saveUnifiedImage(unifiedImage, imageName);
 
         // Limpiar los datos de la imagen dividida
-        dividedImages.remove(messageId);
+        dividedImages.remove(idTarea);
       }
 
     } catch (Exception e) {
@@ -123,7 +170,7 @@ public class Unifier {
 
     private void saveUnifiedImage(BufferedImage image, String imageName) {
       try {
-        String outputDirectory = "C:\\Users\\leo_2\\OneDrive\\Documentos\\GitHub\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\worker\\";
+        String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\";
         String baseImageName = "image";
         String uniqueId = UUID.randomUUID().toString();
         String imagen = baseImageName + "_" + uniqueId  + ".jpg";
