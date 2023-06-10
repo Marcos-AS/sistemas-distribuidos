@@ -90,7 +90,6 @@ public class Unifier {
       String imageName = json.getString("imageName");
       String originalName = json.getString("originalName");
 
-      System.out.println("Received message: " + json);
       System.out.println("Message ID: " + idTarea);
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
@@ -110,7 +109,6 @@ public class Unifier {
       
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
-      //storage.delete(BUCKET_NAME, imageName);
 
       ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
       BufferedImage image = ImageIO.read(bais);
@@ -135,6 +133,10 @@ public class Unifier {
         // Limpiar los datos de la imagen dividida
         dividedImages.remove(idTarea);
       }
+
+      //borra cada pedazo del bucket
+      storage.delete(BUCKET_NAME, imageName);
+
 
     } catch (Exception e) {
         e.printStackTrace();

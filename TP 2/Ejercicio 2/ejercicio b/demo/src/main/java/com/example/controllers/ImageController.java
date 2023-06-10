@@ -154,11 +154,14 @@ public class ImageController {
             ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
             BufferedImage image = ImageIO.read(bais);
 
-            // Envías la imagen como respuesta al cliente
+            // Envía la imagen como respuesta al cliente
             response.setContentType("image/jpeg");
             OutputStream out = response.getOutputStream();
             ImageIO.write(image, "jpeg", out);
             out.close();
+
+            //borra la imagen del bucket
+            storage.delete(BUCKET_NAME,imageName);
 
         } catch (IOException e) {
             e.printStackTrace();
