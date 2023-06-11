@@ -1,0 +1,14 @@
+version: '3'
+services:
+  unifier:
+    image: unifier:latest
+    ports:
+      - 5052:8080
+    volumes:
+      - ../cloud/terraform/terraform.json:/app/terraform.json
+    networks:
+      - red_ej2
+
+networks:
+  red_ej2:
+    external: true

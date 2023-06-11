@@ -7,8 +7,12 @@ services:
       - 15672:15672 # Port for RabbitMQ management panel
     volumes:
       - ./data:/var/lib/rabbitmq # Mount a volume to persist data
+    networks:
+      - red_ej2
 
-      
+networks:
+  red_ej2:
+    external: true      
     # networks:
     #   - network1
     # healthcheck:

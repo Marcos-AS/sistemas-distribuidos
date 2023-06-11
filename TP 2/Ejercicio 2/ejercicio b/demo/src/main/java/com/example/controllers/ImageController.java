@@ -4,24 +4,22 @@ import org.json.JSONObject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.ImagePiece;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Blob.BlobSourceOption;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.awt.image.BufferedImage;
@@ -31,10 +29,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -58,25 +54,24 @@ public class ImageController {
     public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
         // Ruta del archivo JSON de las credenciales
-        String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\cloud\\terraform\\terraform.json";
+        String rutaCredenciales = "/app/terraform.json";
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
     
-                // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
-                StorageOptions storageOptions = StorageOptions.newBuilder()
-                .setCredentials(credentials)
-                .setProjectId(projectId)
-                .build();
+        // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
+        StorageOptions storageOptions = StorageOptions.newBuilder()
+        .setCredentials(credentials)
+        .setProjectId(projectId)
+        .build();
     
         // Obtiene una instancia de Storage desde StorageOptions
         Storage storage = storageOptions.getService();
 
         return storage;
     
-        }
+    }
 
     @PostMapping("/divide-image")
-    public void divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) throws FileNotFoundException, IOException {
-        //List<ImagePiece> imagePieces = new ArrayList<>();
+    public ResponseEntity<String> divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) throws FileNotFoundException, IOException {
 
         String bucketName = BUCKET_NAME;
         Storage storage = inicializarCloud();
@@ -89,20 +84,20 @@ public class ImageController {
             int pieceWidth = width / numPieces;
             int remainingWidth = width % numPieces;
 
-            
             int x = 0;
             String idTarea = UUID.randomUUID().toString();
             for (int i = 0; i < numPieces; i++) {
+
                 String id = UUID.randomUUID().toString();
 
                 if (i == numPieces - 1) {
                     pieceWidth += remainingWidth;
                 }
 
-                //crea pedazo de la imagen
+                // Crea pedazos de la imagen
                 BufferedImage piece = image.getSubimage(x, 0, pieceWidth, height);
 
-                // Convertir la imagen a un array de bytes
+                // Convierte la imagen a un array de bytes
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(piece, "jpg", baos);
                 byte[] imageData = baos.toByteArray();
@@ -116,18 +111,9 @@ public class ImageController {
 
                 // Convertir el objeto JSON a bytes
                 byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
-                // int jsonLength = jsonBytes.length;
 
-                // ByteBuffer buffer = ByteBuffer.allocate(4 + jsonLength);
-                // buffer.putInt(jsonLength);
-                // buffer.put(jsonBytes);
-                // buffer.put(imageData);
-
-                // byte[] combinedMessage = buffer.array();
-                // System.out.println(combinedMessage.length);
-
-                // Sube un archivo al bucket
-                String nombreArchivoRemoto = id; //pone como blobId al id que es nombre de la imagen
+                // Sube la imagen al bucket
+                String nombreArchivoRemoto = id; // Pone como blobId al id que es nombre de la imagen
                 System.out.println(id);
                 BlobId blobId = BlobId.of(bucketName, nombreArchivoRemoto);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
@@ -138,16 +124,21 @@ public class ImageController {
 
                 x += pieceWidth;
             }
+
+            return ResponseEntity.ok("Imagen cargada con éxito :)");
+
         } catch (IOException e) {
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al cargar la imagen :("); 
         }
 
-        //return imagePieces.size();
     }
 
     @GetMapping("/unified-image")
     public void unifiedImage(@RequestParam("nombreImagen") String imageName, HttpServletResponse response) {
+        
         try {
+
             Storage storage = inicializarCloud();
             BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
             Blob blob = storage.get(blobId);
@@ -160,8 +151,11 @@ public class ImageController {
             ImageIO.write(image, "jpeg", out);
             out.close();
 
-            //borra la imagen del bucket
+            // Borra la imagen del bucket
             storage.delete(BUCKET_NAME,imageName);
+
+            // Envía el mensaje de éxito al cliente
+            response.getWriter().write("Imagen descargada con éxito :)");
 
         } catch (IOException e) {
             e.printStackTrace();

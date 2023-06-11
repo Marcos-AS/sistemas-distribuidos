@@ -49,10 +49,10 @@ public class Unifier {
 
   private Map<String, List<byte[]>> dividedImages = new HashMap<>();
 
-    public Storage inicializarCloud() throws FileNotFoundException, IOException {
+  public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
     // Ruta del archivo JSON de las credenciales
-    String rutaCredenciales = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\cloud\\terraform\\terraform.json";
+    String rutaCredenciales = "/app/terraform.json";
     GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
 
     // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
@@ -66,7 +66,7 @@ public class Unifier {
 
     return storage;
 
-    }
+  }
 
   @RabbitListener(queues = {"result-queue"})
   public void processMessage(Message rabbitMessage) {
@@ -74,14 +74,6 @@ public class Unifier {
       Storage storage = inicializarCloud();
 
       byte[] mensaje = (byte[])this.messageConverter.fromMessage(rabbitMessage);
-      // ByteBuffer buffer = ByteBuffer.wrap(combinedMessage);
-      // int jsonLength = buffer.getInt();
-      // System.out.println("jsonLength: " + jsonLength);
-
-      // byte[] jsonBytes = new byte[jsonLength];
-      // byte[] imageBytes = new byte[combinedMessage.length - 4 - jsonLength];
-      // buffer.get(jsonBytes);
-      // buffer.get(imageBytes);
 
       String jsonString = new String(mensaje, StandardCharsets.UTF_8);
       JSONObject json = new JSONObject(jsonString);
@@ -94,19 +86,6 @@ public class Unifier {
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
 
-      /*ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
-      BufferedImage image = ImageIO.read(bais);
-
-      String outputDirectory = "C:\\Users\\leo_2\\OneDrive\\Documentos\\GitHub\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\worker\\";
-      String baseImageName = "image";
-      String uniqueId = UUID.randomUUID().toString();
-      String imagen = baseImageName + "_" + uniqueId  + ".jpg";
-      String outputImagePath = outputDirectory + File.separator + imagen;
-
-      File imagenFile = new File(outputImagePath);
-      ImageIO.write(image, "jpg", imagenFile);
-      System.out.println("Imagen guardada correctamente en: " + imagenFile.getAbsolutePath()); */
-      
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
 
@@ -136,7 +115,6 @@ public class Unifier {
 
       //borra cada pedazo del bucket
       storage.delete(BUCKET_NAME, imageName);
-
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -173,7 +151,7 @@ public class Unifier {
     }
   }
 
-  //guarda en el bucket con el nombre original de la imagen que envió el usuario
+  // Guarda en el bucket con el nombre original de la imagen que envió el usuario
   private void saveUnifiedImage(BufferedImage image, String imageName) {
       try {
         Storage storage = inicializarCloud();
@@ -184,13 +162,6 @@ public class Unifier {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
         storage.create(blobInfo, imageData);
 
-        // String outputDirectory = "C:\\Users\\marco\\OneDrive\\Documentos\\unlu-sdpp-tps-remote\\sistemas-distribuidos\\TP 2\\Ejercicio 2\\ejercicio b\\demo\\";
-        // String imagen = baseImageName + "_" + uniqueId  + ".jpg";
-        // String outputImagePath = outputDirectory + File.separator + imagen;
-  
-        // File imagenFile = new File(outputImagePath);
-        // ImageIO.write(image, "jpg", imagenFile);
-        // System.out.println("Imagen guardada correctamente en: " + imagenFile.getAbsolutePath());
       } catch (Exception e) {
           e.printStackTrace();
       }
