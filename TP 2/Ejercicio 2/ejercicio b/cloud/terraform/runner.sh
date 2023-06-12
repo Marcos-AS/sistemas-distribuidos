@@ -12,9 +12,8 @@ else
    ssh-add $sshkey_name
 fi
 
-
-filepath=/home/david/Documents/GitHub/unlu/unlu-content/sd/main_concepts/10_google_iac/10_00_credentials/terraform.json
-bucket_name="unlu-tf-state"
+filepath="C:\Users\leo_2\OneDrive\Documentos\GitHub\sistemas-distribuidos\TP 2\Ejercicio 2\ejercicio b\cloud\terraform\terraform.json"
+bucket_name="bucket-imagenes-ej2b"
 prefix="gke/state"
 
 terraform init --reconfigure --var credentials_file_path=$filepath \
