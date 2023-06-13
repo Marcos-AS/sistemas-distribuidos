@@ -57,10 +57,11 @@ jobs:
           terraform validate 
 
           terraform plan -lock=false
-           
-           terraform apply -lock=false --auto-approve
+          
+          terraform destroy -lock=false --auto-approve
 
-       #   terraform destroy -lock=false --auto-approve
+         #  terraform apply -lock=false --auto-approve
+
 
 
           
