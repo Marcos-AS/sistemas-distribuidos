@@ -57,8 +57,7 @@ jobs:
           terraform validate 
 
           terraform plan -lock=false
-          terraform state list
-          terraform refresh
+
           terraform destroy -lock=false --auto-approve
          #terraform apply -lock=false --auto-approve
 
