@@ -60,7 +60,7 @@ jobs:
           
           terraform destroy -lock=false --auto-approve
 
-          #terraform apply -lock=false --auto-approve
+        #  terraform apply -lock=false --auto-approve
           
          
         env:
