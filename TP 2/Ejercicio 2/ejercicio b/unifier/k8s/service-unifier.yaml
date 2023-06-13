@@ -1,0 +1,15 @@
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-unifier
+
+# https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec
+spec:
+  selector:
+    app: unifier
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
