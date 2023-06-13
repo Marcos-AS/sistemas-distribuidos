@@ -58,6 +58,7 @@ jobs:
 
           terraform plan -lock=false
           terraform state pull
+          terraform state push
           terraform refresh
           terraform destroy -lock=false --auto-approve
 
