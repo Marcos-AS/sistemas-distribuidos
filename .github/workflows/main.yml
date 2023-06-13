@@ -57,13 +57,12 @@ jobs:
           terraform validate 
 
           terraform plan -lock=false
-          
+
           terraform destroy -lock=false --auto-approve
+         #terraform apply -lock=false --auto-approve
 
-      #    terraform apply -lock=false --auto-approve
-
-  
-
+           
+       
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
