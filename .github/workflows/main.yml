@@ -59,19 +59,10 @@ jobs:
           terraform plan -lock=false
           terraform state list
           terraform refresh
-          terraform destroy -lock=false --auto-approve
+          terraform apply -lock=false --auto-approve
 
-          #terraform apply -lock=false --auto-approve
-
-
-          
-
-
-
-
-
-          
-         
+          #terraform destroy -lock=false --auto-approve 
+       
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
