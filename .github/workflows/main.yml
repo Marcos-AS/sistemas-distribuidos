@@ -55,10 +55,10 @@ jobs:
           --backend-config prefix=$prefix 
 
           terraform validate 
-
-          terraform plan -lock=false
-          
           terraform destroy -lock=false --auto-approve
+
+       #   terraform plan -lock=false
+          
 
         #  terraform apply -lock=false --auto-approve
           
