@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
@@ -13,11 +13,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 
 import org.json.JSONObject;
@@ -47,7 +45,8 @@ public class Unifier {
 
   private final String BUCKET_NAME = "bucket-imagenes-ej2b";
 
-  private Map<String, List<byte[]>> dividedImages = new HashMap<>();
+  // Usar TreeMap para almacenar los pedazos de imagen
+  private Map<String, TreeMap<Integer, byte[]>> dividedImages = new HashMap<>();
 
   public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
@@ -81,10 +80,12 @@ public class Unifier {
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
       String originalName = json.getString("originalName");
+      int pieceNumber = json.getInt("pieceNumber");
 
       System.out.println("Message ID: " + idTarea);
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
+      System.out.println("Piece number: " + pieceNumber);
 
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
@@ -97,14 +98,18 @@ public class Unifier {
 
       // Almacenar el pedazo de imagen recibido
       if (!dividedImages.containsKey(idTarea)) {
-        dividedImages.put(idTarea, new ArrayList<>());
+        dividedImages.put(idTarea, new TreeMap<>());
       }
-      dividedImages.get(idTarea).add(imageData);
+      dividedImages.get(idTarea).put(pieceNumber, imageData);
 
       // Verificar si se han recibido todos los pedazos
       if (dividedImages.get(idTarea).size() == numPieces) {
+        
+        // Obtener los pedazos de imagen en orden
+        List<byte[]> orderedPieces = new ArrayList<>(dividedImages.get(idTarea).values());
+
         // Unificar la imagen
-        BufferedImage unifiedImage = unifyImage(dividedImages.get(idTarea), numPieces);
+        BufferedImage unifiedImage = unifyImage(orderedPieces, numPieces);
 
         // Guardar la imagen unificada
         saveUnifiedImage(unifiedImage, originalName);

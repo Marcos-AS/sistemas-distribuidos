@@ -4,6 +4,8 @@ import org.json.JSONObject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Blob.BlobSourceOption;
+
+import io.micrometer.common.util.StringUtils;
+
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
@@ -32,10 +37,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.io.File;
 
 import javax.imageio.ImageIO;
 
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Controller;
 
 @RestController
 public class ImageController {
@@ -108,6 +116,7 @@ public class ImageController {
                 json.put("pieces", numPieces);
                 json.put("imageName", id);
                 json.put("originalName",file.getOriginalFilename());
+                json.put("pieceNumber", i+1);
 
                 // Convertir el objeto JSON a bytes
                 byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
@@ -135,32 +144,65 @@ public class ImageController {
     }
 
     @GetMapping("/unified-image")
-    public void unifiedImage(@RequestParam("nombreImagen") String imageName, HttpServletResponse response) {
+    public ResponseEntity<?> unifiedImage(@RequestParam("nombreImagen") String imageName) throws IOException {
         
-        try {
+    /*    try {
+            if (StringUtils.isNotBlank(imageName)) {
+                Storage storage = inicializarCloud();
+                BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
+                Blob blob = storage.get(blobId);
 
-            Storage storage = inicializarCloud();
-            BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
-            Blob blob = storage.get(blobId);
+                if (blob.exists()) {
+                    ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
+                    BufferedImage image = ImageIO.read(bais);
+
+                    response.setContentType("image/jpeg");
+                    OutputStream out = response.getOutputStream();
+                    ImageIO.write(image, "jpeg", out);
+                    out.close();
+
+                    storage.delete(BUCKET_NAME, imageName);
+
+                    response.getWriter().write("Imagen descargada con éxito :)");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("Imagen no encontrada en el servidor.");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Parámetro 'nombreImagen' requerido.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Error al procesar la imagen.");
+        }
+    } */
+
+    try {
+        Storage storage = inicializarCloud();
+        BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
+        Blob blob = storage.get(blobId);
+
+        // Verificar si la imagen existe en el bucket
+        if (blob != null && blob.exists()) {
             ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
             BufferedImage image = ImageIO.read(bais);
 
-            // Envía la imagen como respuesta al cliente
-            response.setContentType("image/jpeg");
-            OutputStream out = response.getOutputStream();
-            ImageIO.write(image, "jpeg", out);
-            out.close();
+            // Guardar la imagen en un archivo temporal
+            File tempFile = File.createTempFile(imageName, ".jpg");
+            ImageIO.write(image, "jpeg", tempFile);
 
-            // Borra la imagen del bucket
-            storage.delete(BUCKET_NAME,imageName);
-
-            // Envía el mensaje de éxito al cliente
-            response.getWriter().write("Imagen descargada con éxito :)");
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            // Devolver la imagen al usuario
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(imageName).build());
+            return new ResponseEntity<>(new FileSystemResource(tempFile), headers, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La imagen no se encontró en el bucket");
         }
-
-    };
-    
+    } catch (IOException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la imagen");
+    }
+    }
 }

@@ -56,11 +56,13 @@ public class ImageProcessor {
       String messageId = json.getString("messageId");
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
+      int pieceNumber = json.getInt("pieceNumber");
 
       System.out.println("Received message: " + json);
       System.out.println("Message ID: " + messageId);
       System.out.println("Number of pieces: " + numPieces);
       System.out.println("Image name: " + imageName);
+      System.out.println("Piece number: " + pieceNumber);
 
       //obtiene la imagen desde el bucket
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
