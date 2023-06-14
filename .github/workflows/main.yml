@@ -50,13 +50,13 @@ jobs:
           bucket_name="bucket-imagenes-ej2b"
           prefix="gke/state"
           
-          terraform init --reconfigure \
-          --backend-config bucket=$bucket_name \
-          --backend-config prefix=$prefix 
+          #terraform init --reconfigure \
+          #--backend-config bucket=$bucket_name \
+          #--backend-config prefix=$prefix 
 
           terraform validate 
 
-          terraform plan -lock=false
+          #terraform plan -lock=false
 
           terraform destroy -lock=false --auto-approve
           #terraform apply -lock=false --auto-approve
