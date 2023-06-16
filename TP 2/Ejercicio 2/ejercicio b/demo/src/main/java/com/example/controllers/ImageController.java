@@ -195,6 +195,10 @@ public class ImageController {
             // Devolver la imagen al usuario
             HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(ContentDisposition.builder("attachment").filename(imageName).build());
+            
+            // Eliminamos la imagen del bucket
+            storage.delete(BUCKET_NAME, imageName);
+
             return new ResponseEntity<>(new FileSystemResource(tempFile), headers, HttpStatus.OK);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La imagen no se encontró en el bucket");
