@@ -1,7 +1,7 @@
 version: '3'
 services:
   divide:
-    image: divide:latest
+    image: leoduville5/tp2-ej2-divide:latest
     ports:
       - 5051:8080
     volumes:

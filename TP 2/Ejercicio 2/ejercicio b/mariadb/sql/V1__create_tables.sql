@@ -1,4 +1,4 @@
-create table Tarea (
+create table task (
     id INTEGER NOT NULL,
     estado VARCHAR(20),
     tiempo_inicio TIME,

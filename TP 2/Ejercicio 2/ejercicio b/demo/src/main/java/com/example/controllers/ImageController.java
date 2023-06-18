@@ -14,13 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.DatabaseHandler;
-import com.example.models.Tarea;
+import com.example.models.Task;
 import com.example.repositories.TaskRepository;
+import com.example.services.TaskService;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Blob.BlobSourceOption;
-import com.google.j2objc.annotations.AutoreleasePool;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
@@ -34,7 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.UUID;
 import java.io.File;
 
@@ -47,7 +46,7 @@ import org.springframework.http.HttpHeaders;
 public class ImageController {
 
     @Autowired
-    private TaskRepository taskRepository;
+    private TaskService taskService;
 
     private final RabbitTemplate rabbitTemplate;
     private final String BUCKET_NAME = "bucket-imagenes-ej2b";
@@ -96,14 +95,16 @@ public class ImageController {
             int x = 0;
             String idTarea = UUID.randomUUID().toString();
 
-            Tarea tarea = new Tarea();
+            Task tarea = new Task();
             tarea.setId(idTarea);
             tarea.setEstado("PENDIENTE");
             tarea.setCantPartes(numPieces);
-            tarea.setTiempo_inicio(Time.valueOf("00:00:00"));
-            tarea.setTiempo_fin(Time.valueOf("00:00:00"));
+            tarea.setTiempo_inicio(LocalTime.of(0, 0, 0));
+            tarea.setTiempo_fin(LocalTime.of(0, 0, 0));
 
-            taskRepository.save(tarea);
+            taskService.saveTask(tarea);
+
+            System.out.println("Imagen guarda con éxito en la BD :)");
 
             for (int i = 0; i < numPieces; i++) {
 
@@ -145,7 +146,7 @@ public class ImageController {
                 x += pieceWidth;
             }
 
-            return ResponseEntity.ok("Imagen cargada con éxito :)");
+            return ResponseEntity.ok("Imagen cargada con éxito :). ID de tarea: " + idTarea);
 
         } catch (IOException e) {
             e.printStackTrace();
