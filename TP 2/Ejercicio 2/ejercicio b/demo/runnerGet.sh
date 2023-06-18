@@ -38,8 +38,8 @@
 #!/bin/bash
 
 url="http://34.30.153.169:8080/unified-image"
-imageName="guason.jpg"
-outputFile="output3.jpg"
+imageName="dada.jpg"
+outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo
 response=$(curl -s -w "%{http_code}" -o "$outputFile" "$url?nombreImagen=$imageName")

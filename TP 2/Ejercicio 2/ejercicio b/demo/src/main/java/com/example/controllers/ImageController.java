@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.DatabaseHandler;
+import com.example.models.Tarea;
+import com.example.repositories.TaskRepository;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Blob.BlobSourceOption;
-
-import io.micrometer.common.util.StringUtils;
-
+import com.google.j2objc.annotations.AutoreleasePool;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -33,8 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
 import java.util.UUID;
 import java.io.File;
 
@@ -42,10 +42,12 @@ import javax.imageio.ImageIO;
 
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Controller;
 
 @RestController
 public class ImageController {
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     private final RabbitTemplate rabbitTemplate;
     private final String BUCKET_NAME = "bucket-imagenes-ej2b";
@@ -93,6 +95,16 @@ public class ImageController {
 
             int x = 0;
             String idTarea = UUID.randomUUID().toString();
+
+            Tarea tarea = new Tarea();
+            tarea.setId(idTarea);
+            tarea.setEstado("PENDIENTE");
+            tarea.setCantPartes(numPieces);
+            tarea.setTiempo_inicio(Time.valueOf("00:00:00"));
+            tarea.setTiempo_fin(Time.valueOf("00:00:00"));
+
+            taskRepository.save(tarea);
+
             for (int i = 0; i < numPieces; i++) {
 
                 String id = UUID.randomUUID().toString();
