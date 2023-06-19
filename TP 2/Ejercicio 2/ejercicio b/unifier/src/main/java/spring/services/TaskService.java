@@ -1,12 +1,12 @@
-package com.example.services;
+package spring.services;
 
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.models.Task;
-import com.example.repositories.TaskRepository;
+import spring.models.Task;
+import spring.repositories.TaskRepository;
 
 @Service
 public class TaskService {
@@ -18,12 +18,14 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
     
-    public Task saveTask(Task user) {
-        return taskRepository.save(user);
-    }
+    public void updateState(String idTarea) {
+        
+        Optional<Task> task = taskRepository.findById(idTarea);
 
-    public Optional<Task> findTask(String idTask) {
-        return taskRepository.findById(idTask);
+        if (task != null) {
+            task.get().setEstado("TERMINADO");
+            taskRepository.save(task.get());
+        }
     }
 
 }

@@ -37,12 +37,12 @@
 
 #!/bin/bash
 
-url="http://34.30.153.169:8080/unified-image"
-imageName="dada.jpg"
+url="http://localhost:5051/unified-image"
+taskId="5310b1c4-0975-49ff-ad86-e51a7aaaf769"
 outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo
-response=$(curl -s -w "%{http_code}" -o "$outputFile" "$url?nombreImagen=$imageName")
+response=$(curl -s -w "%{http_code}" -o "$outputFile" "$url?idTarea=$taskId")
 
 # Extraer el código de estado de la respuesta
 httpCode=${response: -3}
@@ -54,6 +54,5 @@ if [[ $httpCode -eq 200 ]]; then
 else
   # El código de estado es diferente de 200, se produjo un error
   echo "Error al descargar la imagen. Código de estado: $httpCode"
-  echo "$response" | sed '$d'
 fi
 

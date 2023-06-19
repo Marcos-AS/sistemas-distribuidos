@@ -22,10 +22,11 @@ import org.json.JSONObject;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Resource;
+import spring.services.TaskService;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
@@ -37,7 +38,11 @@ import com.google.cloud.storage.Blob.BlobSourceOption;
 
 @Component
 public class Unifier {
-  @Resource
+
+  @Autowired
+  private TaskService taskService;
+
+  @Autowired
   private MessageConverter messageConverter;
   
   @Value("${projectid}")
@@ -79,7 +84,7 @@ public class Unifier {
       String idTarea = json.getString("messageId");
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
-      String originalName = json.getString("originalName");
+     // String originalName = json.getString("originalName");
       int pieceNumber = json.getInt("pieceNumber");
 
       System.out.println("Message ID: " + idTarea);
@@ -112,7 +117,10 @@ public class Unifier {
         BufferedImage unifiedImage = unifyImage(orderedPieces, numPieces);
 
         // Guardar la imagen unificada
-        saveUnifiedImage(unifiedImage, originalName);
+        saveUnifiedImage(unifiedImage, idTarea);
+
+        // Cambiamos el estado de la tarea a "TERMINADO"
+        taskService.updateState(idTarea);
 
         // Limpiar los datos de la imagen dividida
         dividedImages.remove(idTarea);
@@ -166,7 +174,6 @@ public class Unifier {
         byte[] imageData = baos.toByteArray();
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
         storage.create(blobInfo, imageData);
-
       } catch (Exception e) {
           e.printStackTrace();
       }

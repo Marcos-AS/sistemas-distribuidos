@@ -1,7 +1,7 @@
 version: '3'
 services:
   unifier:
-    image: unifier:latest
+    image: leoduville5/tp2-ej2-unifier:latest
     ports:
       - 5052:8080
     volumes:

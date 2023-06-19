@@ -1,7 +1,7 @@
 version: '3'
 services:
   worker:
-    image: worker:latest
+    image: leoduville5/tp2-ej2-worker:latest
     ports:
       - 5053:8080
     volumes:

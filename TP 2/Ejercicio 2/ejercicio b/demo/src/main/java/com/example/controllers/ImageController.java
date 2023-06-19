@@ -34,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.io.File;
 
@@ -156,7 +157,7 @@ public class ImageController {
     }
 
     @GetMapping("/unified-image")
-    public ResponseEntity<?> unifiedImage(@RequestParam("nombreImagen") String imageName) throws IOException {
+    public ResponseEntity<?> unifiedImage(@RequestParam("idTarea") String idTarea) throws IOException {
         
     /*    try {
             if (StringUtils.isNotBlank(imageName)) {
@@ -192,33 +193,42 @@ public class ImageController {
     } */
 
     try {
-        Storage storage = inicializarCloud();
-        BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
-        Blob blob = storage.get(blobId);
 
-        // Verificar si la imagen existe en el bucket
-        if (blob != null && blob.exists()) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
-            BufferedImage image = ImageIO.read(bais);
+        // Buscamos en la base de datos la tarea solicitada
+        Optional<Task> task = taskService.findTask(idTarea);
 
-            // Guardar la imagen en un archivo temporal
-            File tempFile = File.createTempFile(imageName, ".jpg");
-            ImageIO.write(image, "jpeg", tempFile);
+        
 
-            // Devolver la imagen al usuario
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.builder("attachment").filename(imageName).build());
-            
-            // Eliminamos la imagen del bucket
-            storage.delete(BUCKET_NAME, imageName);
+        if (task != null && task.get().getEstado().equals("TERMINADO")) {
 
-            return new ResponseEntity<>(new FileSystemResource(tempFile), headers, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La imagen no se encontró en el bucket");
+            Storage storage = inicializarCloud();
+            BlobId blobId = BlobId.of(BUCKET_NAME, task.get().getId());
+            Blob blob = storage.get(blobId);
+
+            // Verificar si la imagen existe en el bucket
+            if (blob != null && blob.exists()) {
+                ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
+                BufferedImage image = ImageIO.read(bais);
+
+                // Guardar la imagen en un archivo temporal
+                File tempFile = File.createTempFile(task.get().getId(), ".jpg");
+                ImageIO.write(image, "jpeg", tempFile);
+
+                // Devolver la imagen al usuario
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentDisposition(ContentDisposition.builder("attachment").filename(task.get().getId()).build());
+                
+                // Eliminamos la imagen del bucket
+                storage.delete(BUCKET_NAME, task.get().getId());
+                return new ResponseEntity<>(new FileSystemResource(tempFile), headers, HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La imagen no se encontró en el bucket");
+            }
         }
     } catch (IOException e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la imagen");
     }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Imagen inexistente");
     }
 }
