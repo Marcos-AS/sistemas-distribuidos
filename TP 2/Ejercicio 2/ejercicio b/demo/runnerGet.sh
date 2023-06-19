@@ -38,7 +38,7 @@
 #!/bin/bash
 
 url="http://localhost:5051/unified-image"
-taskId="5310b1c4-0975-49ff-ad86-e51a7aaaf769"
+taskId="605b948f-98af-4c64-a21d-5572b0fb382d"
 outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo
@@ -49,10 +49,13 @@ httpCode=${response: -3}
 
 # Verificar el código de estado y actuar en consecuencia
 if [[ $httpCode -eq 200 ]]; then
-  # El código de estado es 200, se descargó la imagen correctamente
-  echo "Imagen descargada correctamente"
+    # El código de estado es 200, se descargó la imagen correctamente
+    echo "Imagen descargada correctamente"
+elif [[ $httpCode -eq 202 ]]; then
+    # El código de estado es 202, el servidor continua procesando
+    echo "La imagen se encuentra en procesamiento..."
 else
-  # El código de estado es diferente de 200, se produjo un error
-  echo "Error al descargar la imagen. Código de estado: $httpCode"
+    # El código de estado es diferente de 200, se produjo un error
+    echo "Error al descargar la imagen. Código de estado: $httpCode"
 fi
 

@@ -197,7 +197,9 @@ public class ImageController {
         // Buscamos en la base de datos la tarea solicitada
         Optional<Task> task = taskService.findTask(idTarea);
 
-        
+        if (task != null && task.get().getEstado().equals("PENDIENTE")) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("La imagen se encuentra en procesamiento.");
+        }
 
         if (task != null && task.get().getEstado().equals("TERMINADO")) {
 
@@ -229,6 +231,6 @@ public class ImageController {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la imagen");
     }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Imagen inexistente");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una imagen asociada a dicho ID.");
     }
 }

@@ -19,19 +19,19 @@ services:
     ports:
       - 8085:8080
     networks:
-      - red_ej2
+     - red_ej2
   
-  flyway:
-    image: flyway/flyway
-    command: ["-url=jdbc:mariadb://mariadb:3306/bd_imagenes", "-user=root", "-password=example", "migrate"]
-    volumes:
-       - ./sql:/flyway/sql
-    depends_on:
-       - mariadb
-    links:
-       - mariadb
-    networks:
-      - red_ej2
+  # flyway:
+  #   image: flyway/flyway
+  #   command: ["-url=jdbc:mariadb://mariadb:3306/bd_imagenes", "-user=root", "-password=example", "migrate"]
+  #   volumes:
+  #      - ./sql:/flyway/sql
+  #   depends_on:
+  #      - mariadb
+  #   links:
+  #      - mariadb
+  #   networks:
+  #     - red_ej2
 
 networks:
   red_ej2:
