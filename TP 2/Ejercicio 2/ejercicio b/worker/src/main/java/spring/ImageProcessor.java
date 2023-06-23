@@ -1,6 +1,5 @@
 package spring;
 
-import jakarta.annotation.Resource;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,13 +38,9 @@ public class ImageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(ImageProcessor.class);
 
-  private final RabbitTemplate rabbitTemplate;
-  
   @Autowired
-  public ImageProcessor(RabbitTemplate rabbitTemplate) {
-    this.rabbitTemplate = rabbitTemplate;
-  }
-
+  private RabbitTemplate rabbitTemplate;
+  
   private final String BUCKET_NAME = "bucket-imagenes-ej2b";
   
   @RabbitListener(queues = {"image-queue"})
