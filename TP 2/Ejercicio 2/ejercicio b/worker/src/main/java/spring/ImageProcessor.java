@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import javax.imageio.ImageIO;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,11 +31,13 @@ import com.google.cloud.storage.Blob.BlobSourceOption;
 @Component
 public class ImageProcessor {
 
-  @Resource
+  @Autowired
   private MessageConverter messageConverter;
   
   @Value("${projectid}")
   private String projectId;
+
+  private static final Logger logger = LoggerFactory.getLogger(ImageProcessor.class);
 
   private final RabbitTemplate rabbitTemplate;
   
@@ -58,11 +62,11 @@ public class ImageProcessor {
       String imageName = json.getString("imageName");
       int pieceNumber = json.getInt("pieceNumber");
 
-      System.out.println("Received message: " + json);
-      System.out.println("Message ID: " + messageId);
-      System.out.println("Number of pieces: " + numPieces);
-      System.out.println("Image name: " + imageName);
-      System.out.println("Piece number: " + pieceNumber);
+      logger.info(String.format("Mensaje recibido."));
+      logger.info(String.format("Message ID: " + messageId));
+      logger.info(String.format("Number of pieces: " + numPieces));
+      logger.info(String.format("Image name: " + imageName));
+      logger.info(String.format("Piece number: " + pieceNumber));
 
       //obtiene la imagen desde el bucket
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
@@ -93,7 +97,8 @@ public class ImageProcessor {
   public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
     // Ruta del archivo JSON de las credenciales
-    String rutaCredenciales = "/app/terraform.json";
+    String rutaCredenciales = "/app/terraform.json"; 
+    //System.getenv("GOOGLE_CREDENTIALS");
     GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
 
     // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
@@ -107,7 +112,7 @@ public class ImageProcessor {
 
     return storage;
 
-    }
+  }
 
   private static BufferedImage convertToGrayscale(BufferedImage image) {
     int width = image.getWidth();

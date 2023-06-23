@@ -12,11 +12,6 @@ import org.springframework.amqp.core.*;
 @Configuration
 public class RabbitMQConfig {
 
- /*   @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    } */
-
     private static final String QUEUE_NAME = "result-queue";
     private static final String exchangeName = "my-image-exchange";
     private static final String routingKey = "image-routing-key";
@@ -33,11 +28,6 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
     
-    // @Bean
-    // public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-    //     return new RabbitTemplate(connectionFactory);
-    // }
-
     @Bean
     public Queue imageQueue() {
         return new Queue(QUEUE_NAME, true);

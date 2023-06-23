@@ -2,6 +2,10 @@ package com.example;
 
 import javax.sql.DataSource;
 
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
@@ -21,9 +25,10 @@ public class App {
     @FlywayDataSource
     public DataSource flywayDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl("jdbc:mariadb://mariadb:3306/bd_imagenes");
+        dataSource.setUrl("jdbc:mariadb://bd-service.default.svc.cluster.local:3306/bd_imagenes");
         dataSource.setUsername("root");
         dataSource.setPassword("example");
         return dataSource;
     }
+    
 }

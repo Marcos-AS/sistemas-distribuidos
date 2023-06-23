@@ -1,6 +1,9 @@
 package com.example.config;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,6 +27,19 @@ public class RabbitMQConfig {
     @Bean
     public Binding binding() {
         return BindingBuilder.bind(imageQueue()).to(imageExchange()).with(routingKey);
+    }
+
+    @Autowired
+    private AmqpAdmin amqpAdmin;
+
+    @PostConstruct
+    public void initializeQueue() {
+        Queue imageQueue = new Queue(QUEUE_NAME, true);
+        DirectExchange imageExchange = new DirectExchange(exchangeName);
+        Binding binding = BindingBuilder.bind(imageQueue).to(imageExchange).with(routingKey);
+        amqpAdmin.declareQueue(imageQueue);
+        amqpAdmin.declareExchange(imageExchange);
+        amqpAdmin.declareBinding(binding);
     }
 
 }

@@ -1,44 +1,10 @@
 #curl -X GET -F "nombreImagen=image.jpg"  http://localhost:8080/unified-image --output imagen.jpg
 #curl -X GET -F "nombreImagen=leo.jpg"  http://34.172.110.4:8080/unified-image --output imgs/messi.jpg
 
-#Realizar la solicitud GET y guardar la respuesta en un archivo
-#curl -s -o response.txt -w "%{http_code}" "http://34.172.110.4:8080/unified-image?nombreImagen=leo.jpg"
-
-#Leer el código de estado de la respuesta
-#http_code=$(tail -n 1 response.txt)
-
-#Verificar el código de estado y actuar en consecuencia
-#if [[ $http_code -eq 200 ]]; then
-  #El código de estado es 200, se descargó la imagen correctamente
-# mv response.txt output.jpg
-#else
-  #El código de estado es diferente de 200, se produjo un error
-# cat response.txt
-#fi
-
-#Eliminar el archivo de respuesta temporal
-#rm response.txt
-
 #!/bin/bash
 
-#cmd=$(curl -X GET -F "nombreImagen=leo.jpg"  http://34.121.48.246:8080/unified-image)
-#execution_cmd_result=$?
-
-#if [[ $execution_cmd_result -eq 0 ]]
-#then
-#    echo "execution command result: $execution_cmd_result"
-#    echo "File downloaded OK"
-#else
-#   echo "execution command result: $execution_cmd_result"
-#   echo "Error downloading, retry"
-# fi
-
-#curl -OJ -X GET -F "nombreImagen=leo.jpg" http://34.121.48.246:8080/unified-image
-
-#!/bin/bash
-
-url="http://localhost:5051/unified-image"
-taskId="605b948f-98af-4c64-a21d-5572b0fb382d"
+url="http://34.132.190.96:8080/unified-image"
+taskId="98af4dc7-9817-4458-9402-09268d5f1863"
 outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo
@@ -55,7 +21,7 @@ elif [[ $httpCode -eq 202 ]]; then
     # El código de estado es 202, el servidor continua procesando
     echo "La imagen se encuentra en procesamiento..."
 else
-    # El código de estado es diferente de 200, se produjo un error
+    # El código de estado es diferent e de 200, se produjo un error
     echo "Error al descargar la imagen. Código de estado: $httpCode"
 fi
 

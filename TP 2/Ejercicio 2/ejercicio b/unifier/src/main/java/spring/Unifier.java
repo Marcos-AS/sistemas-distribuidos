@@ -19,6 +19,8 @@ import java.io.IOException;
 
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -47,6 +49,8 @@ public class Unifier {
   
   @Value("${projectid}")
   private String projectId;
+
+  private static final Logger logger = LoggerFactory.getLogger(Unifier.class);
 
   private final String BUCKET_NAME = "bucket-imagenes-ej2b";
 
@@ -84,13 +88,13 @@ public class Unifier {
       String idTarea = json.getString("messageId");
       int numPieces = json.getInt("pieces");
       String imageName = json.getString("imageName");
-     // String originalName = json.getString("originalName");
       int pieceNumber = json.getInt("pieceNumber");
 
-      System.out.println("Message ID: " + idTarea);
-      System.out.println("Number of pieces: " + numPieces);
-      System.out.println("Image name: " + imageName);
-      System.out.println("Piece number: " + pieceNumber);
+      logger.info(String.format("Mensaje recibido."));
+      logger.info(String.format("Message ID: " + idTarea));
+      logger.info(String.format("Number of pieces: " + numPieces));
+      logger.info(String.format("Image name: " + imageName));
+      logger.info(String.format("Piece number: " + pieceNumber));
 
       BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
       Blob blob = storage.get(blobId);
@@ -135,10 +139,13 @@ public class Unifier {
   }
 
   private BufferedImage unifyImage(List<byte[]> imagePieces, int numPieces) {
+    
     // Obtener información de los pedazos de imagen
     byte[] firstPiece = imagePieces.get(0);
     ByteArrayInputStream bais = new ByteArrayInputStream(firstPiece);
+    
     try {
+
         BufferedImage firstImage = ImageIO.read(bais);
         int width = firstImage.getWidth();
         int height = firstImage.getHeight();
@@ -157,7 +164,9 @@ public class Unifier {
         }
 
         g.dispose();
+        
         return unifiedImage;
+
     } catch (Exception e) {
         e.printStackTrace();
         return null;
@@ -167,6 +176,14 @@ public class Unifier {
   // Guarda en el bucket con el nombre original de la imagen que envió el usuario
   private void saveUnifiedImage(BufferedImage image, String imageName) {
       try {
+
+        logger.debug(
+          String.format(
+              "Se ejecuta el método saveUnifiedImage. [idTarea = %s]",
+              imageName
+          )
+        );
+
         Storage storage = inicializarCloud();
         BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

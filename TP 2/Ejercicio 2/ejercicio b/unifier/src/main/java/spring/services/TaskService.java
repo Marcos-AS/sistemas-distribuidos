@@ -22,7 +22,7 @@ public class TaskService {
         
         Optional<Task> task = taskRepository.findById(idTarea);
 
-        if (task != null) {
+        if (task.isPresent()) {
             task.get().setEstado("TERMINADO");
             taskRepository.save(task.get());
         }

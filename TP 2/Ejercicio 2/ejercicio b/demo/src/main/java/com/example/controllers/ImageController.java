@@ -1,11 +1,9 @@
 package com.example.controllers;
 
-import org.json.JSONObject;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.ContentDisposition;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,34 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.models.Task;
-import com.example.repositories.TaskRepository;
 import com.example.services.TaskService;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Blob.BlobSourceOption;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalTime;
-import java.util.Optional;
-import java.util.UUID;
-import java.io.File;
-
-import javax.imageio.ImageIO;
-
-
-import org.springframework.http.HttpHeaders;
 
 @RestController
 public class ImageController {
@@ -49,109 +23,27 @@ public class ImageController {
     @Autowired
     private TaskService taskService;
 
-    private final RabbitTemplate rabbitTemplate;
-    private final String BUCKET_NAME = "bucket-imagenes-ej2b";
-
-    @Value("${projectid}")
-    private String projectId;
-
-    @Autowired
-    public ImageController(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
-
-    public Storage inicializarCloud() throws FileNotFoundException, IOException {
-
-        // Ruta del archivo JSON de las credenciales
-        String rutaCredenciales = "/app/terraform.json";
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(rutaCredenciales));
-    
-        // Crea una instancia de StorageOptions con las credenciales y el ID del proyecto
-        StorageOptions storageOptions = StorageOptions.newBuilder()
-        .setCredentials(credentials)
-        .setProjectId(projectId)
-        .build();
-    
-        // Obtiene una instancia de Storage desde StorageOptions
-        Storage storage = storageOptions.getService();
-
-        return storage;
-    
-    }
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     @PostMapping("/divide-image")
     public ResponseEntity<String> divideImage(@RequestParam("file") MultipartFile file, @RequestParam("numPieces") int numPieces) throws FileNotFoundException, IOException {
 
-        String bucketName = BUCKET_NAME;
-        Storage storage = inicializarCloud();
-
         try {
-            BufferedImage image = ImageIO.read(file.getInputStream());
-            int width = image.getWidth();
-            int height = image.getHeight();
 
-            int pieceWidth = width / numPieces;
-            int remainingWidth = width % numPieces;
+            logger.debug(
+                String.format(
+                    "Se ejecuta el método divide. [file = %s]",
+                    file.toString()
+                )
+            );
 
-            int x = 0;
-            String idTarea = UUID.randomUUID().toString();
-
-            Task tarea = new Task();
-            tarea.setId(idTarea);
-            tarea.setEstado("PENDIENTE");
-            tarea.setCantPartes(numPieces);
-            tarea.setTiempo_inicio(LocalTime.of(0, 0, 0));
-            tarea.setTiempo_fin(LocalTime.of(0, 0, 0));
-
-            taskService.saveTask(tarea);
-
-            System.out.println("Imagen guarda con éxito en la BD :)");
-
-            for (int i = 0; i < numPieces; i++) {
-
-                String id = UUID.randomUUID().toString();
-
-                if (i == numPieces - 1) {
-                    pieceWidth += remainingWidth;
-                }
-
-                // Crea pedazos de la imagen
-                BufferedImage piece = image.getSubimage(x, 0, pieceWidth, height);
-
-                // Convierte la imagen a un array de bytes
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(piece, "jpg", baos);
-                byte[] imageData = baos.toByteArray();
-
-                // Crear el objeto JSON
-                JSONObject json = new JSONObject();
-                json.put("messageId", idTarea);
-                json.put("pieces", numPieces);
-                json.put("imageName", id);
-                json.put("originalName",file.getOriginalFilename());
-                json.put("pieceNumber", i+1);
-
-                // Convertir el objeto JSON a bytes
-                byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
-
-                // Sube la imagen al bucket
-                String nombreArchivoRemoto = id; // Pone como blobId al id que es nombre de la imagen
-                System.out.println(id);
-                BlobId blobId = BlobId.of(bucketName, nombreArchivoRemoto);
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-                storage.create(blobInfo, imageData);
-
-                // Enviar el mensaje combinado a la cola de RabbitMQ
-                rabbitTemplate.convertAndSend("image-queue", jsonBytes);
-
-                x += pieceWidth;
-            }
-
-            return ResponseEntity.ok("Imagen cargada con éxito :). ID de tarea: " + idTarea);
+            return taskService.divideImage(file, numPieces);
 
         } catch (IOException e) {
+
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al cargar la imagen :("); 
+        
         }
 
     }
@@ -159,78 +51,22 @@ public class ImageController {
     @GetMapping("/unified-image")
     public ResponseEntity<?> unifiedImage(@RequestParam("idTarea") String idTarea) throws IOException {
         
-    /*    try {
-            if (StringUtils.isNotBlank(imageName)) {
-                Storage storage = inicializarCloud();
-                BlobId blobId = BlobId.of(BUCKET_NAME, imageName);
-                Blob blob = storage.get(blobId);
+        try {
 
-                if (blob.exists()) {
-                    ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
-                    BufferedImage image = ImageIO.read(bais);
+            logger.debug(
+                String.format(
+                    "Se ejecuta el método unifiedImage. [idTarea = %s]",
+                    idTarea
+                )
+            );
 
-                    response.setContentType("image/jpeg");
-                    OutputStream out = response.getOutputStream();
-                    ImageIO.write(image, "jpeg", out);
-                    out.close();
+            return taskService.unifiedImage(idTarea);
 
-                    storage.delete(BUCKET_NAME, imageName);
-
-                    response.getWriter().write("Imagen descargada con éxito :)");
-                } else {
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    response.getWriter().write("Imagen no encontrada en el servidor.");
-                }
-            } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("Parámetro 'nombreImagen' requerido.");
-            }
         } catch (IOException e) {
+
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Error al procesar la imagen.");
-        }
-    } */
-
-    try {
-
-        // Buscamos en la base de datos la tarea solicitada
-        Optional<Task> task = taskService.findTask(idTarea);
-
-        if (task != null && task.get().getEstado().equals("PENDIENTE")) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("La imagen se encuentra en procesamiento.");
-        }
-
-        if (task != null && task.get().getEstado().equals("TERMINADO")) {
-
-            Storage storage = inicializarCloud();
-            BlobId blobId = BlobId.of(BUCKET_NAME, task.get().getId());
-            Blob blob = storage.get(blobId);
-
-            // Verificar si la imagen existe en el bucket
-            if (blob != null && blob.exists()) {
-                ByteArrayInputStream bais = new ByteArrayInputStream(blob.getContent(BlobSourceOption.generationMatch()));
-                BufferedImage image = ImageIO.read(bais);
-
-                // Guardar la imagen en un archivo temporal
-                File tempFile = File.createTempFile(task.get().getId(), ".jpg");
-                ImageIO.write(image, "jpeg", tempFile);
-
-                // Devolver la imagen al usuario
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentDisposition(ContentDisposition.builder("attachment").filename(task.get().getId()).build());
-                
-                // Eliminamos la imagen del bucket
-                storage.delete(BUCKET_NAME, task.get().getId());
-                return new ResponseEntity<>(new FileSystemResource(tempFile), headers, HttpStatus.OK);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La imagen no se encontró en el bucket");
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la imagen");
-    }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una imagen asociada a dicho ID.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la imagen");
+        
+        }  
     }
 }
