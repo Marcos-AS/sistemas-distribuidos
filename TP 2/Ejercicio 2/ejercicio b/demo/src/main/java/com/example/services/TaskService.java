@@ -199,8 +199,8 @@ public class TaskService {
         Optional<Task> task = taskRepository.findById(idTarea);
 
         long segundos = task.get().getTiempo_fin().toSecondOfDay() - task.get().getTiempo_inicio().toSecondOfDay();
-
-        return ResponseEntity.status(HttpStatus.OK).body("Tiempo: " + segundos);
+        LocalTime time = LocalTime.ofSecondOfDay(segundos);
+        return ResponseEntity.status(HttpStatus.OK).body("Tiempo: " + time);
 
     }
 
