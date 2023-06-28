@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.threeten.bp.Duration;
+import org.threeten.bp.LocalDateTime;
 
 import com.example.controllers.ImageController;
 import com.example.models.Task;
@@ -54,14 +57,6 @@ public class TaskService {
 
     @Autowired
     private TaskRepository taskRepository;
-
-    public Task saveTask(Task user) {
-        return taskRepository.save(user);
-    }
-
-    public Optional<Task> findTask(String idTask) {
-        return taskRepository.findById(idTask);
-    }
 
     public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
@@ -102,7 +97,7 @@ public class TaskService {
             tarea.setId(idTarea);
             tarea.setEstado("PENDIENTE");
             tarea.setCantPartes(numPieces);
-            tarea.setTiempo_inicio(LocalTime.of(0, 0, 0));
+            tarea.setTiempo_inicio(LocalTime.now());
             tarea.setTiempo_fin(LocalTime.of(0, 0, 0));
 
             taskRepository.save(tarea);
@@ -194,6 +189,18 @@ public class TaskService {
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una imagen asociada a dicho ID.");
+
+    }
+
+
+    public ResponseEntity<String> getTaskTime(String idTarea) {
+        
+        // Buscamos en la base de datos la tarea solicitada
+        Optional<Task> task = taskRepository.findById(idTarea);
+
+        long segundos = task.get().getTiempo_fin().toSecondOfDay() - task.get().getTiempo_inicio().toSecondOfDay();
+
+        return ResponseEntity.status(HttpStatus.OK).body("Tiempo: " + segundos);
 
     }
 

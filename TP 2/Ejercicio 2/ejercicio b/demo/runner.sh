@@ -1,5 +1,20 @@
 # Enviamos imagen para dividir en fragmentos
+curl -X POST -F "file=@imgs/leo.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
 curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/image.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/leo.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/image.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+curl -X POST -F "file=@imgs/guason.jpg" -F "numPieces=4" http://35.238.181.59:8080/divide-image
+
+
 #curl -X POST -F "file=@guason.jpg" -F "numPieces=4" http://34.30.153.169:8080/divide-image
 
 

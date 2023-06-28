@@ -34,6 +34,13 @@ spec:
       containers:
       - name: worker
         image: leoduville5/tp2-ej2-worker:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
         env:
         - name: "PORT"
           value: "8080"

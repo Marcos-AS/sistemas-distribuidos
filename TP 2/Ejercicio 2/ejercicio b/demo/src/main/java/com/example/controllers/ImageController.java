@@ -69,4 +69,17 @@ public class ImageController {
         
         }  
     }
+
+    @GetMapping("/taskTime")
+    public ResponseEntity<?> taskTime(@RequestParam("idTarea") String idTarea) throws IOException {
+        
+        logger.debug(
+            String.format(
+                "Se ejecuta el método taskTime. [idTarea = %s]",
+                idTarea
+            )
+        );
+
+        return taskService.getTaskTime(idTarea);  
+    }
 }

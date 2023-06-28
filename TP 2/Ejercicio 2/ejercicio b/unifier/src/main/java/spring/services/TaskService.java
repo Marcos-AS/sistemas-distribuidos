@@ -1,5 +1,6 @@
 package spring.services;
 
+import java.time.LocalTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class TaskService {
 
         if (task.isPresent()) {
             task.get().setEstado("TERMINADO");
+            task.get().setTiempo_fin(LocalTime.now());
             taskRepository.save(task.get());
         }
     }
