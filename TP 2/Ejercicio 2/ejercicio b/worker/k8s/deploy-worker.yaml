@@ -36,11 +36,11 @@ spec:
         image: leoduville5/tp2-ej2-worker:latest
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "64Mi"
+            cpu: "125m"
           limits:
-            memory: "512Mi"
-            cpu: "1000m"
+            memory: "128Mi"
+            cpu: "250m"
         env:
         - name: "PORT"
           value: "8080"
