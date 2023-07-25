@@ -21,7 +21,7 @@ resource "google_container_node_pool" "general" {
 
   node_config {
     preemptible  = false
-    machine_type = "e2-medium"
+    machine_type = "e2-highcpu-4"
 
     labels = {
       role = "general"
@@ -51,7 +51,7 @@ resource "google_container_node_pool" "spot" {
 
   node_config {
     preemptible  = true
-    machine_type = "e2-medium"
+    machine_type = "e2-highcpu-4"
 
     labels = {
       team = "devops"
