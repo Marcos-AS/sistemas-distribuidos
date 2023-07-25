@@ -36,11 +36,11 @@ spec:
         image: leoduville5/tp2-ej2-unifier:latest
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "500m"
-          limits:
             memory: "512Mi"
             cpu: "1000m"
+          limits:
+            memory: "1024Mi"
+            cpu: "2000m"
         env:
         - name: "PORT"
           value: "8080"
