@@ -3,8 +3,8 @@
 
 #!/bin/bash
 
-url="http://35.224.36.56:8080/unified-image"
-taskId="d80fbe8c-e60e-4c9c-bc72-d3a9df72c4b9"
+url="http://34.29.139.23:8080/unified-image"
+taskId="3733d4c1-4d05-4818-9233-9214f5ebf819"
 outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo

@@ -8,7 +8,7 @@ metadata:
 
 # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
 spec:
-  replicas: 3
+  replicas: 8
 
   # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   # https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/label-selector/#LabelSelector
@@ -39,7 +39,7 @@ spec:
             memory: "256Mi"
             cpu: "500m"
           limits:
-            memory: "512Mi"
+            memory: "2048Mi"
             cpu: "1000m"
         env:
         - name: "PORT"
