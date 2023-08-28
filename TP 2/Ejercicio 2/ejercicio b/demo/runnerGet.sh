@@ -4,7 +4,7 @@
 #!/bin/bash
 
 url="http://35.239.175.13:8080/unified-image"
-taskId="50a311f9-418d-495d-a56b-cf78c14bb13e"
+taskId="2a6738e6-68f1-40f8-8040-be66ee1c7c06"
 outputFile="output.jpg"
 
 # Realizar la solicitud GET y guardar la respuesta en un archivo

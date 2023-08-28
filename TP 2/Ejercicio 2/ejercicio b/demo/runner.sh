@@ -1,6 +1,15 @@
 # Enviamos imagen para dividir en fragmentos
-#curl -X POST -F "file=@imgs/20mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
-curl --verbose --parallel --parallel-immediate --parallel-max 50  -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+curl -X POST -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
+#curl --verbose --parallel --parallel-immediate --parallel-max 2 -F "file=@imgs/1.83mb.jpg" -F "numPieces=4" http://35.239.175.13:8080/divide-image
 
 
 # Comandos para despliegue en cloud
