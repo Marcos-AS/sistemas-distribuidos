@@ -55,7 +55,7 @@ public class controlador {
       String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
       cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", docker_container);
 
-      Thread.sleep(5000);
+      Thread.sleep(10000);
       String ip = "127.0.0.1";
       //apiPath = api/task/example
 			String url = "http://"+ip+":"+randomNum+task.getApiPath()+task.getMethodPath();
