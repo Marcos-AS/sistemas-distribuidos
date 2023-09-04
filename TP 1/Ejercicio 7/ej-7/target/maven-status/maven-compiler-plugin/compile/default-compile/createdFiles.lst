@@ -1,7 +1,6 @@
-MyData.class
-HttpRequests.class
-controlador.class
 MyClient.class
-TareaGenerica.class
-CmdRunner.class
-Application.class
+spring\services\HttpRequests.class
+spring\Application.class
+spring\services\CmdRunner.class
+spring\model\TareaGenerica.class
+spring\controller\controlador.class

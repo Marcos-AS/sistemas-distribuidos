@@ -38,8 +38,9 @@ public class HttpRequests {
                 System.out.println(request);
                 
                 //se envía la petición sincrónicamente
+                System.out.println("eweww");
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        
+                System.out.println("dadea");
                 System.out.println(response.body());
         } catch (Exception e) {
                System.err.println("ERROR: "+e.getMessage());
