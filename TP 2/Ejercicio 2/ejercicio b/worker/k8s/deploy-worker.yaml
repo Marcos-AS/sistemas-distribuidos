@@ -8,7 +8,7 @@ metadata:
 
 # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
 spec:
-  replicas: 3
+  replicas: 4
 
   # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   # https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/label-selector/#LabelSelector
@@ -36,10 +36,10 @@ spec:
         image: leoduville5/tp2-ej2-worker:latest
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "100Mi"
+            cpu: "250m"
           limits:
-            memory: "512Mi"
+            memory: "2048Mi"
             cpu: "1000m"
         env:
         - name: "PORT"
