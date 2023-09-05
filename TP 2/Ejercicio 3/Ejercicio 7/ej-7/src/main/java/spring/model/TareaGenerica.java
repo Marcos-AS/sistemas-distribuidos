@@ -1,89 +1,43 @@
 package spring.model;
 
 import java.io.Serializable;
+import java.time.LocalTime;
 import java.util.HashMap;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Entity
+@Data
+@Table(name="task")
 public class TareaGenerica implements Serializable {
 
-    private Long id;
-    private Long ClientID;
+    @Id
+    @Column(name="id")
+    private String id;
+
+    @Column(name="taskName")
     private String taskName;
+    
+    @Column(name="estado")
+    private String estado;
+
     private String fullContainerImage;
-    private String apiPath;
-    private String methodPath;
+
+   // private String apiPath;
+
+   // private String methodPath;
+
+   /* @Column(name="tiempo_inicio")
+    private LocalTime tiempo_inicio;
+
+    @Column(name="tiempo_fin")
+    private LocalTime tiempo_fin; */
+
     private HashMap<String, String> parameters = new HashMap<String, String>();
-
-
-    public TareaGenerica() {
-
-    }
-
-    public String getMethodPath() {
-        return this.methodPath;
-    }
-
-    public void setMethodPath(String methodPath) {
-        this.methodPath = methodPath;
-    }
-    
-
-    public String getApiPath() {
-        return this.apiPath;
-    }
-
-    public void setApiPath(String apiPath) {
-        this.apiPath = apiPath;
-    }
-    
-
-    public Long getClientID() {
-        return this.ClientID;
-    }
-
-    public void setClientID(Long ClientID) {
-        this.ClientID = ClientID;
-    }
-
-    
-    
-    public TareaGenerica(String taskName, String fullContainerImage, HashMap<String, String> parameters) {
-        this.taskName = taskName;
-        this.fullContainerImage = fullContainerImage;
-        this.parameters = parameters;
-    }   
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTaskName() {
-        return this.taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public String getFullContainerImage() {
-        return this.fullContainerImage;
-    }
-
-    public void setFullContainerImage(String fullContainerImage) {
-        this.fullContainerImage = fullContainerImage;
-    }
-
-    public HashMap<String,String> getParameters() {
-        return this.parameters;
-    }
-
-    public void setParameters(HashMap<String,String> parameters) {
-        this.parameters = parameters;
-    }
-
-
 
 }

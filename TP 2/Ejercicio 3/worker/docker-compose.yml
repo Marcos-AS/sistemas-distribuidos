@@ -1,0 +1,14 @@
+version: '3'
+services:
+  worker:
+    image: leoduville5/tp2-ej2-worker:latest
+    ports:
+      - 5053:8080
+    volumes:
+      - ../cloud/terraform/terraform.json:/app/terraform.json
+    networks:
+      - red_ej2
+
+networks:
+  red_ej2:
+    external: true

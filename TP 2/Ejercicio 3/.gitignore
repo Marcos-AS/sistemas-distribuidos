@@ -1,0 +1,8 @@
+rabbitmq/data/
+target/
+.vscode/
+*.jar
+bin/
+able-tide-388304-ee07778c2484.json
+*.env
+.settings/
