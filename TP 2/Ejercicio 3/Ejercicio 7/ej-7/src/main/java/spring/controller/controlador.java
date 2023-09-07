@@ -1,6 +1,8 @@
 package spring.controller;
 import com.google.gson.Gson;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
@@ -13,9 +15,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.json.JSONObject;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -39,6 +44,9 @@ public class controlador {
   @Autowired
   TaskRepository taskRepository;
 
+  @Autowired
+  private RabbitTemplate rabbitTemplate;
+
   //método ejecutar tarea remota, las peticiones POST las maneja este método
   @PostMapping("/createTask")
   public ResponseEntity<?> executeRemoteTask(@RequestBody String taskJson) {
@@ -55,6 +63,18 @@ public class controlador {
       task.setEstado("EN PROCESO");
       taskRepository.save(task);
 
+      // Crear el objeto JSON
+      JSONObject json = new JSONObject();
+      json.put("messageId", idTarea);
+      json.put("parameters", task.getParameters());
+      json.put("taskName",task.getTaskName());
+
+      // Convertir el objeto JSON a bytes
+      byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
+
+      // Enviar el mensaje combinado a la cola de RabbitMQ
+      rabbitTemplate.convertAndSend("task-queue", jsonBytes);
+
       //2) busca un puerto disponible (num aleatorio entre min y max)
       Boolean port_available = false;
 			int randomNum = 8500;
@@ -62,7 +82,7 @@ public class controlador {
 				randomNum = ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
 				
 				//String result = cmdRunner.runCommand("C:/Users/leo_2/AppData/Local/Temp", "ss -tulpn | grep :"+randomNum+" | head -n1");
-				String result = cmdRunner.runCommand("C:/Users/leo_2/AppData/Local/Temp", "netstat -ano | findstr :" + randomNum + " | findstr LISTENING | findstr /V 0.0.0.0");
+				String result = cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", "netstat -ano | findstr :" + randomNum + " | findstr LISTENING | findstr /V 0.0.0.0");
 
         if (result.length() > 0){
           System.out.println("port not available, retrying");
@@ -75,8 +95,8 @@ public class controlador {
 
       //3) levanta el contenedor
 
-      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
-      cmdRunner.runCommand("C:/Users/leo_2/AppData/Local/Temp", docker_container);
+      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" --network red_ej2 -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
+      cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", docker_container);
 
       Thread.sleep(10000);
       /*String ip = "127.0.0.1";

@@ -1,0 +1,14 @@
+version: '3'
+services:
+  divide:
+    image: leoduville5/tp2-ej2-divide:latest
+    ports:
+      - 5051:8080
+    volumes:
+      - ../cloud/terraform/terraform.json:/app/terraform.json
+    networks:
+      - red_ej2
+
+networks:
+  red_ej2:
+    external: true

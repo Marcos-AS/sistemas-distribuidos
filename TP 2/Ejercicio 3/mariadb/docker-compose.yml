@@ -10,16 +10,12 @@ services:
       MARIADB_ROOT_PASSWORD: example
     ports:
       - 3306:3306
-    networks:
-      - red_ej2
 
   adminer_tp3:
     image: adminer
     restart: always
     ports:
       - 8085:8080
-    networks:
-     - red_ej2
   
   # flyway:
   #   image: flyway/flyway
@@ -32,7 +28,3 @@ services:
   #      - mariadb
   #   networks:
   #     - red_ej2
-
-networks:
-  red_ej2:
-    external: true
