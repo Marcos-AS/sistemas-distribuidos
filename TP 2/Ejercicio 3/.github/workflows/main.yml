@@ -47,7 +47,7 @@ jobs:
         run: |
 
           ls -lah
-          bucket_name="bucket-imagenes-ej2b"
+          bucket_name="bucket-tareas-ej3"
           prefix="gke/state"
           
           terraform init --reconfigure \
