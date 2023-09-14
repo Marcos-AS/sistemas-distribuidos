@@ -10,7 +10,7 @@ variable "zone" {
 
 variable "credentials_file_path" {
   description = "Path to GCP service account credentials file"
-  default     = "./terraform.json"
+  default     = "${ secrets.GOOGLE_CREDENTIALS }"
 }
 
 variable "project_id" {

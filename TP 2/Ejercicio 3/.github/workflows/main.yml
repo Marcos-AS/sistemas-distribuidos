@@ -1,4 +1,4 @@
-name: Second TF Pipeline 
+name: First TF Pipeline 
 
 on:
   push:
