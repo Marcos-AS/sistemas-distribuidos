@@ -43,11 +43,11 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        working-directory: TP 2/Ejercicio 2/ejercicio b/cloud/terraform
+        working-directory: TP 2/Ejercicio 3/cloud/terraform
         run: |
 
           ls -lah
-          bucket_name="bucket-imagenes-ej2b"
+          bucket_name="bucket-tareas-ej3"
           prefix="gke/state"
           
           terraform init --reconfigure \
