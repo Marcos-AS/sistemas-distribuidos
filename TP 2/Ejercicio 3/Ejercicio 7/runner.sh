@@ -5,3 +5,5 @@ curl -X POST http://localhost:8092/api/taskmanager/createTask -H 'Content-Type: 
 
 
 #curl -X POST http://localhost:8080/api/task/example/runTask -H 'Content-Type: application/json' -d '{"numA": "10", "numB":"20"}'
+
+#gcloud container clusters get-credentials primary --zone us-central1-a --project firm-source-399022

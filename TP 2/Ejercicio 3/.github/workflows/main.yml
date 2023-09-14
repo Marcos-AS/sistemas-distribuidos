@@ -1,0 +1,106 @@
+name: First TF Pipeline 
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  setup-stage:
+    outputs:
+      env-name: ${{ steps.env-name.outputs.env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Environment Name
+        id: env-name
+        run: echo "env=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+  TFInstall:
+    needs: [setup-stage] 
+    
+    runs-on: ubuntu-latest
+    
+    environment: 
+      name: ${{ needs.setup-stage.outputs.env-name }}
+      
+    env:
+      # secrets -> https://github.com/dpetrocelli/unlu-content/settings/secrets/actions
+      
+      name: ${{ needs.setup-stage.outputs.env-name }}
+      # PORT: ${{ secrets.PORT }}
+      # CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+    
+    steps:
+      # STEP 0 - Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        working-directory: TP 2/Ejercicio 3/cloud/terraform
+        run: |
+
+          ls -lah
+          bucket_name="bucket-imagenes-ej2b"
+          prefix="gke/state"
+          
+          terraform init --reconfigure \
+          --backend-config bucket=$bucket_name \
+          --backend-config prefix=$prefix 
+
+          terraform validate 
+
+          terraform plan -lock=false
+
+          #terraform destroy -lock=false --auto-approve
+          terraform apply -lock=false --auto-approve
+
+           
+       
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      # # STEP 2 - Build JAR based on env vars (taken from secrets) 
+      # - name: Run ls command
+      #   working-directory: sd/main_concepts/09_nodejs_pipeline
+      #   run: |
+      #     ls -lah
+          
+  K8sDeploy:
+    needs: [TFInstall] 
+    
+    runs-on: ubuntu-latest
+    
+    environment: 
+      name: ${{ needs.setup-stage.outputs.env-name }}
+      
+    env:
+      # secrets -> https://github.com/dpetrocelli/unlu-content/settings/secrets/actions
+      
+      name: ${{ needs.setup-stage.outputs.env-name }}
+      # PORT: ${{ secrets.PORT }}
+      # CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+    
+    steps:
+      # STEP 0 - Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client
+      
+      # - name: Install GCP cli
+      #   run: |
+      #     sudo apt-get install apt-transport-https ca-certificates gnupg  
+      #     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+      #     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
