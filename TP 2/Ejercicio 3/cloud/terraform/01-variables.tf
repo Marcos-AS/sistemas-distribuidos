@@ -8,10 +8,10 @@ variable "zone" {
   default = "us-central1-a"
 }
 
-# variable "credentials_file_path" {
-#   description = "Path to GCP service account credentials file"
-#   default     = "./terraform.json"
-# }
+variable "credentials_file_path" {
+  description = "Path to GCP service account credentials file"
+  default     = "./terraform.json"
+}
 
 variable "project_id" {
   type    = string
