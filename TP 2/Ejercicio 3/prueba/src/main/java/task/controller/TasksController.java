@@ -46,6 +46,10 @@ public class TasksController {
 				parameters.put(key, value);
 			}
 			Task t = new Task(Integer.parseInt(parameters.get("numA")), Integer.parseInt(parameters.get("numB")));
+			
+			// cambiar estado de la tarea en la bd
+			
+
 			int result = t.addMethod();	
 			log.info ("remote job result: "+result);
 			System.out.println("resultado: " + result);

@@ -12,8 +12,3 @@ resource "google_project_service" "cloud_resource_manager" {
   service            = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
-
-# resource "github_actions_secret" "gcp_secret" {
-#   repository       = "sistemas-distribuidos"
-#   secret_name      = "GOOGLE_CREDENTIALS"
-# }
