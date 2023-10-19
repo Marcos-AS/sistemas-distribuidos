@@ -56,10 +56,10 @@ jobs:
 
           terraform validate 
 
-          terraform plan -lock=false
+          terraform plan --var credentials_file_path = ${{ secrets.GOOGLE_CREDENTIALS}} -lock=false
 
           #terraform destroy -lock=false --auto-approve
-          terraform apply -lock=false --auto-approve
+          terraform apply --var credentials_file_path = ${{ secrets.GOOGLE_CREDENTIALS}} -lock=false --auto-approve
 
            
        

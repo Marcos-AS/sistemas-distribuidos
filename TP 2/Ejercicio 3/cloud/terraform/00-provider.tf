@@ -15,7 +15,7 @@ terraform {
 
 
 provider "google" {
-  credentials = file(var.credentials_file_path)
+  #credentials = github_actions_secret
   project     = var.project_id
   region      = var.region
   zone        = var.zone
