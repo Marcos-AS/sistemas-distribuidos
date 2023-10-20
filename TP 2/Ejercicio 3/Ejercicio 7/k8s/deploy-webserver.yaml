@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deployment-worker
+  name: deployment-webserver
   namespace: default
 
 # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
@@ -14,7 +14,7 @@ spec:
   # https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/label-selector/#LabelSelector
   selector:
     matchLabels:
-      app: worker
+      app: webserver
 
   # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-template-v1/#PodTemplate
   template:
@@ -24,20 +24,20 @@ spec:
 
       # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
       labels: # Todas las etiquetas son privadas, por la falta de prefijo.
-        app: worker
-        tier: worker
+        app: webserver
+        tier: webserver
 
     # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
     spec:
 
       # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#Container
       containers:
-      - name: worker
-        image: leoduville5/tp2-ej2-worker:latest
+      - name: webserver
+        image: marcos1as/imagen-ej7:latest
         resources:
           requests:
-            memory: "100Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "500m"
           limits:
             memory: "2048Mi"
             cpu: "1000m"
