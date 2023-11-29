@@ -8,7 +8,7 @@ metadata:
 
 # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec
 spec:
-  replicas: 4
+  replicas: 1
 
   # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
   # https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/label-selector/#LabelSelector
@@ -33,7 +33,7 @@ spec:
       # https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#Container
       containers:
       - name: webserver
-        image: marcos1as/imagen-ej7:latest
+        image: leoduville5/tp2-ej3-webserver:latest
         resources:
           requests:
             memory: "256Mi"

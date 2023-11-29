@@ -40,7 +40,7 @@ spec:
         - name: MARIADB_ROOT_PASSWORD
           value: "example"  # Reemplaza con tu contraseña deseada
         - name: MYSQL_DATABASE
-          value: "bd_imagenes"
+          value: "bd_task"
 
         # - name: POSTGRES_USER
         #   valueFrom:

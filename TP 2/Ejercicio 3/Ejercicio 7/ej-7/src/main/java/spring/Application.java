@@ -22,7 +22,7 @@ public class Application {
     @FlywayDataSource
     public DataSource flywayDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl("jdbc:mariadb://localhost:3306/bd_task");
+        dataSource.setUrl("jdbc:mariadb://bd-service.default.svc.cluster.local:3306/bd_task");
         dataSource.setUsername("root");
         dataSource.setPassword("example");
         return dataSource;
