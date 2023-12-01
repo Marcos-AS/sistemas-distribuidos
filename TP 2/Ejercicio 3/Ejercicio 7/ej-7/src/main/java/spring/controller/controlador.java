@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 import org.json.JSONObject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,12 +30,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.fabric8.kubernetes.client.*;
+import io.fabric8.kubernetes.api.model.apps.*;
+
 
 @RestController
 @RequestMapping(value = "/api/taskmanager")
 public class controlador {
-  int min = 8000;
-  int max = 9999;
+
   private Gson gson = new Gson();
 
   @Value("${projectid}")
@@ -51,54 +53,40 @@ public class controlador {
   @PostMapping("/createTask")
   public ResponseEntity<?> executeRemoteTask(@RequestBody String taskJson) {
     //HttpResponse<String> response = null;
-    try {
-      CmdRunner cmdRunner = new CmdRunner();
-      //HttpRequests httpManager = new HttpRequests();
 
-      //1) deserialización a objeto TareaGenerica desde JSON
+    try {
+     //HttpRequests httpManager = new HttpRequests();
+     
+     //1) deserialización a objeto TareaGenerica desde JSON
       TareaGenerica task = gson.fromJson(taskJson, TareaGenerica.class);
-      System.out.println(task.getTaskName());
+      System.out.println("Nombre de la tarea: " + task.getTaskName());
       String idTarea = UUID.randomUUID().toString();
       task.setId(idTarea);
       task.setEstado("EN PROCESO");
       taskRepository.save(task);
 
-      // Crear el objeto JSON
+      // Crea objeto JSON
       JSONObject json = new JSONObject();
       json.put("messageId", idTarea);
       json.put("parameters", task.getParameters());
-      json.put("taskName",task.getTaskName());
+      json.put("taskName", task.getTaskName());
 
       // Convertir el objeto JSON a bytes
       byte[] jsonBytes = json.toString().getBytes(StandardCharsets.UTF_8);
 
-      // Enviar el mensaje combinado a la cola de RabbitMQ
+      // Enviar el mensaje a la cola de RabbitMQ
       rabbitTemplate.convertAndSend("task-queue", jsonBytes);
 
-      //2) busca un puerto disponible (num aleatorio entre min y max)
-      Boolean port_available = false;
-			int randomNum = 8500;
-			while (!port_available) {
-				randomNum = ThreadLocalRandom.current().nextInt(this.min, this.max + 1);
-				
-				//String result = cmdRunner.runCommand("C:/Users/leo_2/AppData/Local/Temp", "ss -tulpn | grep :"+randomNum+" | head -n1");
-				String result = cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", "netstat -ano | findstr :" + randomNum + " | findstr LISTENING | findstr /V 0.0.0.0");
-
-        if (result.length() > 0){
-          System.out.println("port not available, retrying");
-        }else{
-					port_available = true;
-					System.out.println("Port "+randomNum+" free, let's start docker container");	
-				}
-				Thread.sleep(2000);
-			}
-
-      //3) levanta el contenedor
-
-      String docker_container = "docker run --rm --name="+task.getTaskName()+"-"+randomNum+" --network red_ej2 -ti -d -p "+randomNum+":8080 "+ task.getFullContainerImage();
-      cmdRunner.runCommand("C:/Users/marco/AppData/Local/Temp", docker_container);
-
       Thread.sleep(10000);
+
+      try (KubernetesClient k8sCli = new KubernetesClientBuilder().build()) {
+          String deploymentName = "deployment-worker";
+          Deployment deployment = k8sCli.apps().deployments().inNamespace("default").withName(deploymentName).get();
+          int currentReplicas = deployment.getSpec().getReplicas();
+          k8sCli.apps().deployments().inNamespace("default").withName(deploymentName).scale(currentReplicas+1);
+      } catch (KubernetesClientException e) {
+        e.printStackTrace();
+      }
       /*String ip = "127.0.0.1";
       //apiPath = api/task/example
 			String url = "http://"+ip+":"+randomNum+task.getApiPath()+task.getMethodPath();
@@ -111,7 +99,7 @@ public class controlador {
 		}
 
     return new ResponseEntity<String>("Tarea almacenada. Deberia devolver el ID de la tarea. ", HttpStatus.CREATED);
-  }
+}
 
   public Storage inicializarCloud() throws FileNotFoundException, IOException {
 
