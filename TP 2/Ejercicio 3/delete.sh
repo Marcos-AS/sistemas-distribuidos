@@ -6,6 +6,5 @@ kubectl delete service bd-service
 kubectl delete service service-rabbitmq
 kubectl delete service service-webserver
 kubectl delete service service-worker
-kubectl delete service kubernetes
 kubectl get deploy
 kubectl get service
