@@ -59,7 +59,7 @@ jobs:
           terraform plan -lock=false
 
           #terraform destroy -lock=false --auto-approve
-          #terraform apply -lock=false --auto-approve
+          terraform apply -lock=false --auto-approve
 
            
        
