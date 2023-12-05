@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: marcos1as/tp2ej3worker
+        image: leoduvill5/tp2-ej3-worker
         resources:
           requests:
             memory: "100Mi"

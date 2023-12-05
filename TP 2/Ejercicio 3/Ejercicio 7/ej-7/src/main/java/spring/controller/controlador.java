@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.kubernetes.client.*;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.api.model.apps.*;
 
 
@@ -79,14 +81,33 @@ public class controlador {
 
       Thread.sleep(10000);
 
-      try (KubernetesClient k8sCli = new KubernetesClientBuilder().build()) {
+    /* try (KubernetesClient k8sCli = new KubernetesClientBuilder().build()) {
           String deploymentName = "deployment-worker";
           Deployment deployment = k8sCli.apps().deployments().inNamespace("default").withName(deploymentName).get();
           int currentReplicas = deployment.getSpec().getReplicas();
           k8sCli.apps().deployments().inNamespace("default").withName(deploymentName).scale(currentReplicas+1);
       } catch (KubernetesClientException e) {
         e.printStackTrace();
-      }
+      } */
+
+      // Importa las clases necesarias
+
+    // Crea un cliente de Kubernetes
+    try (KubernetesClient client = new DefaultKubernetesClient()) {
+        // Define los detalles del Pod
+        Pod pod = new PodBuilder()
+                .withNewMetadata().withName("deployment-worker").endMetadata()
+                .withNewSpec()
+                .addNewContainer().withName("worker").withImage("leoduville5/tp2-ej3-worker:latest").endContainer()
+                .endSpec()
+                .build();
+
+    // Crea el Pod en el clúster
+    client.pods().create(pod);
+}
+
+
+
       /*String ip = "127.0.0.1";
       //apiPath = api/task/example
 			String url = "http://"+ip+":"+randomNum+task.getApiPath()+task.getMethodPath();
